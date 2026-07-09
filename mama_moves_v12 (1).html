@@ -1,0 +1,2420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#6b8f71">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mama Moves">
+<title>Mama Moves — v12</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700;800;900&display=swap');
+
+/* ── TOKENS ── */
+:root{
+  --cream:#faf8f4;--white:#fff;--ink:#2a2622;--muted:#7a7167;--border:#e4dfd6;
+  --sage:#6b8f71;--sage-lt:#e8f0e9;--terr:#c47d5e;--terr-lt:#f7ede6;--gold:#d4a853;--gold-lt:#fdf3e0;
+  --phase:#6b8f71;--phase-lt:#e8f0e9;--phase-dark:#55785b;
+  --rest-bg:#e8f2fb;--rest-ring:#4a90c2;--rest-dark:#2c5f86;
+  --shadow:0 8px 26px rgba(42,38,34,.08);
+}
+body.phase-1{--phase:#6b8f71;--phase-lt:#e8f0e9;--phase-dark:#55785b}
+body.phase-2{--phase:#8a9b55;--phase-lt:#f1f3df;--phase-dark:#6b7a3e}
+body.phase-3{--phase:#c47d5e;--phase-lt:#f7ede6;--phase-dark:#a96343}
+body.phase-4{--phase:#9f5a48;--phase-lt:#f4e5df;--phase-dark:#753d31}
+
+/* ── BASE ── */
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);font-size:14px;line-height:1.48}
+
+/* ── HEADER ── */
+.header{background:linear-gradient(135deg,var(--phase-dark),var(--phase));color:white;text-align:center;padding:30px 18px 23px}
+.header h1{font-family:'DM Serif Display',serif;font-size:clamp(30px,8vw,46px);line-height:1;letter-spacing:-.6px}
+.header h1 em{font-style:italic;color:rgba(255,255,255,.72)}
+.header p{font-size:13px;opacity:.82;margin-top:8px}
+.ribbon{background:var(--phase-lt);color:var(--phase-dark);font-size:13px;text-align:center;font-weight:900;padding:10px 14px;border-bottom:1px solid color-mix(in srgb,var(--phase) 40%,white)}
+
+/* ── LAYOUT ── */
+.app{max-width:980px;margin:auto;padding-bottom:36px}
+.section{padding:13px 12px}
+.section-title{font-family:'DM Serif Display',serif;font-size:20px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.section-title:before{content:'';width:4px;height:22px;background:var(--phase);border-radius:4px;flex-shrink:0}
+
+/* ── CARDS / DETAILS ── */
+.card,.details,.guided{background:white;border:1.5px solid var(--border);border-radius:16px;box-shadow:var(--shadow);margin-bottom:10px}
+.card{padding:14px}
+.details{overflow:hidden}
+.details summary{list-style:none;padding:12px 14px;font-weight:900;cursor:pointer;display:flex;justify-content:space-between}
+.details summary:after{content:'⌄';font-size:18px;color:var(--muted)}
+.details[open] summary:after{transform:rotate(180deg)}
+.details-body{border-top:1px solid var(--border);padding:13px 14px}
+
+/* ── ATOMS ── */
+.small{font-size:12px;color:var(--muted)}
+.badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;background:var(--phase-lt);color:var(--phase-dark);font-size:11px;font-weight:900;padding:4px 9px}
+.badge.gold{background:var(--gold-lt);color:#7a5c1e}
+.badge.soft{background:#f0ece6;color:var(--muted)}
+.badge.locked{background:#eee;color:#999}
+
+/* ── DASHBOARD ── */
+.dashboard{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+.dash{background:linear-gradient(180deg,#fff,var(--phase-lt));border:1px solid color-mix(in srgb,var(--phase) 25%,white);border-radius:14px;padding:10px}
+.dash-label{font-size:10px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.dash-value{font-size:19px;font-weight:900;color:var(--phase-dark);line-height:1.1}
+.dash-note{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ── MISSION ── */
+.mission{border:2px solid var(--phase);background:linear-gradient(180deg,#fff,var(--phase-lt));border-radius:18px;padding:14px}
+.mission h3{font-family:'DM Serif Display',serif;font-size:21px;margin-bottom:4px}
+.mission-main{font-size:18px;font-weight:900;color:var(--phase-dark)}
+.mission-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+
+/* ── PHASE UNLOCK BANNER ── */
+.unlock-banner{
+  display:flex;align-items:center;gap:12px;
+  background:linear-gradient(135deg,var(--gold-lt),#fff);
+  border:2px solid var(--gold);border-radius:18px;
+  padding:14px;
+  animation:unlockSlide .4s ease-out;
+}
+.backup-banner{
+  display:flex;align-items:center;gap:12px;
+  background:linear-gradient(135deg,#e8f2fb,#fff);
+  border:2px solid #6fa8d0;border-radius:18px;
+  padding:14px;
+  animation:unlockSlide .4s ease-out;
+}
+@keyframes unlockSlide{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.unlock-icon{font-size:30px;flex-shrink:0}
+.unlock-text{flex:1;min-width:0}
+.unlock-title{font-family:'DM Serif Display',serif;font-size:17px;color:#7a5c1e}
+.unlock-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.unlock-actions{display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+.unlock-actions .btn{font-size:11px;padding:7px 12px;white-space:nowrap}
+
+/* ── PHASE SESSION PROGRESS ── */
+.session-card{
+  background:white;border:1.5px solid var(--border);
+  border-radius:16px;padding:13px 14px;
+}
+.session-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.session-label{font-size:12px;font-weight:900;color:var(--ink)}
+.session-count{font-size:12px;font-weight:900;color:var(--phase-dark)}
+.session-track{height:9px;background:var(--border);border-radius:999px;overflow:hidden}
+.session-fill{height:100%;background:linear-gradient(90deg,var(--phase),var(--phase-dark));border-radius:999px;transition:width .4s ease-out}
+.session-note{font-size:11px;color:var(--muted);margin-top:7px}
+.session-foot{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:7px;flex-wrap:wrap}
+.session-foot .session-note{margin-top:0}
+.session-reset{
+  background:none;border:none;color:var(--muted);
+  font-size:10px;font-weight:700;text-decoration:underline;
+  cursor:pointer;padding:0;white-space:nowrap;
+}
+.session-reset:active{opacity:.6}
+.session-card.maxed .session-fill{background:linear-gradient(90deg,var(--gold),#b8863a)}
+.session-card.maxed .session-count{color:#7a5c1e}
+
+/* ── CONTROLS ── */
+.controls{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.mini{display:flex;align-items:center;gap:4px;background:white;border:1px solid var(--border);border-radius:999px;padding:4px}
+.mini span{font-size:10px;font-weight:900;color:var(--muted);text-transform:uppercase;margin-left:4px}
+.pill{border:none;background:#f0ece6;color:var(--muted);border-radius:999px;min-width:29px;height:28px;padding:0 8px;font-size:11px;font-weight:900;cursor:pointer}
+.pill.active{background:var(--phase);color:white}
+.pill.disabled{opacity:.42;text-decoration:line-through;cursor:not-allowed}
+.btn{border:none;background:var(--ink);color:white;border-radius:999px;padding:7px 10px;font-size:11px;font-weight:900;cursor:pointer}
+.btn.secondary{background:#f0ece6;color:var(--muted)}
+.btn.phase{background:var(--phase)}
+
+/* ══════════════════════════════════════════
+   GUIDED TIMER — v8 complete rewrite
+   ══════════════════════════════════════════ */
+
+.guided{
+  padding:14px;
+  background:linear-gradient(180deg,#fff,var(--phase-lt));
+  border-color:color-mix(in srgb,var(--phase) 35%,white);
+  border-radius:22px;
+  transition:background .35s, border-color .35s;
+}
+
+/* REST MODE — full card takeover */
+.guided.rest-mode{
+  background:linear-gradient(160deg,#1e3a5f 0%,#2c5f86 60%,#1a4a72 100%) !important;
+  border-color:#1e3a5f !important;
+  transition:background .4s, border-color .4s;
+}
+
+/* hide work-mode elements during rest */
+.guided.rest-mode .tracker-head,
+.guided.rest-mode .tracker-weight-row,
+.guided.rest-mode .state-pill,
+.guided.rest-mode .timer-ring-wrap,
+.guided.rest-mode .tracker-meta,
+.guided.rest-mode .tracker-progress,
+.guided.rest-mode .g-next,
+.guided.rest-mode .recovery-cue{display:none !important}
+
+/* TEST: for the video test circuit, keep the pill + ring visible through rest (instead of the rest-takeover swap),
+   so the exercise video + timer stay on screen continuously — higher specificity wins over the !important rule above */
+.guided.rest-mode.video-test-active .rest-takeover{display:none !important}
+.guided.rest-mode.video-test-active .state-pill{display:flex !important}
+.guided.rest-mode.video-test-active .timer-ring-wrap{display:block !important}
+.guided.rest-mode.video-test-active .guided-screen,
+.guided.rest-mode.video-test-active .guided-main-row{display:flex !important}
+
+/* keep controls + finish visible, recolour */
+.guided.rest-mode .gc-row{margin-top:0}
+.guided.rest-mode .gc-btn{background:rgba(255,255,255,.12);color:rgba(255,255,255,.8)}
+.guided.rest-mode .gc-btn.primary{background:rgba(255,255,255,.22);color:white}
+.guided.rest-mode .gc-btn.icon.active{background:rgba(255,255,255,.3);color:white;box-shadow:none}
+.guided.rest-mode .finish-btn{background:rgba(255,255,255,.1);color:rgba(255,255,255,.6)}
+
+/* ── REST TAKEOVER PANEL ── */
+.rest-takeover{
+  display:none;
+  text-align:center;
+  padding:6px 4px 14px;
+  animation:restFadeIn .35s ease-out;
+}
+@keyframes restFadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.guided.rest-mode .rest-takeover{display:block}
+
+/* countdown strip at top */
+.rest-strip{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;
+}
+.rest-strip-label{
+  font-size:10px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;
+  color:rgba(255,255,255,.5);
+}
+.rest-strip-timer{
+  font-size:28px;font-weight:900;color:white;
+  font-variant-numeric:tabular-nums;line-height:1;
+  background:rgba(255,255,255,.12);
+  border-radius:12px;padding:4px 14px;
+  min-width:70px;text-align:center;
+}
+.rest-strip-next{
+  font-size:10px;font-weight:900;letter-spacing:.6px;text-transform:uppercase;
+  color:rgba(255,255,255,.5);
+}
+
+/* ── BREATHING CIRCLE ── */
+.breath-wrap{
+  position:relative;
+  width:160px;height:160px;
+  margin:0 auto 16px;
+  display:flex;align-items:center;justify-content:center;
+}
+/* outer breathing ring */
+.breath-ring{
+  position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.07) 0%,rgba(255,255,255,.03) 60%,transparent 100%);
+  border:1.5px solid rgba(255,255,255,.15);
+  animation:breatheOut 4s ease-in-out infinite;
+}
+/* middle ring */
+.breath-ring-mid{
+  position:absolute;
+  width:120px;height:120px;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.2);
+  background:rgba(255,255,255,.04);
+  animation:breatheOut 4s ease-in-out infinite .3s;
+}
+/* inner glow disc */
+.breath-disc{
+  position:relative;z-index:2;
+  width:80px;height:80px;border-radius:50%;
+  animation:breatheIn 4s ease-in-out infinite;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .5s, box-shadow .5s;
+}
+/* inhale: warm golden glow */
+.breath-disc.inhale{
+  background:radial-gradient(circle,rgba(255,240,180,.38) 0%,rgba(220,160,60,.25) 70%,transparent 100%);
+  box-shadow:0 0 32px rgba(220,170,60,.5), inset 0 0 14px rgba(255,240,180,.2);
+}
+/* exhale: cool blue glow */
+.breath-disc.exhale{
+  background:radial-gradient(circle,rgba(180,220,255,.3) 0%,rgba(40,100,160,.4) 70%,transparent 100%);
+  box-shadow:0 0 24px rgba(40,100,200,.4), inset 0 0 10px rgba(140,190,240,.15);
+}
+.breath-arrow{
+  font-size:40px;
+  line-height:1;
+  transition:color .5s;
+  user-select:none;
+}
+.breath-disc.inhale .breath-arrow{ color:rgba(255,220,100,.95) }
+.breath-disc.exhale .breath-arrow{ color:rgba(160,210,255,.95) }
+@keyframes breatheIn{
+  0%,100%{transform:scale(.82);box-shadow:0 0 14px rgba(74,144,194,.2),inset 0 0 8px rgba(255,255,255,.06)}
+  50%{transform:scale(1.12);box-shadow:0 0 36px rgba(74,144,194,.55),inset 0 0 18px rgba(255,255,255,.15)}
+}
+@keyframes breatheOut{
+  0%,100%{transform:scale(.9);opacity:.5}
+  50%{transform:scale(1.15);opacity:1}
+}
+/* next exercise info */
+.rest-next-label{
+  font-size:10px;font-weight:900;letter-spacing:.7px;text-transform:uppercase;
+  color:rgba(255,255,255,.45);margin-bottom:6px;
+}
+.rest-next-name{
+  font-family:'DM Serif Display',serif;
+  font-size:30px;color:white;line-height:1.05;margin-bottom:10px;
+  text-shadow:0 2px 12px rgba(0,0,0,.25);
+}
+.rest-next-chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:10px}
+.rest-chip{border-radius:999px;padding:5px 12px;font-size:12px;font-weight:900}
+.rest-chip.w{background:rgba(255,255,255,.15);color:white}
+.rest-chip.m{background:rgba(255,255,255,.09);color:rgba(255,255,255,.8)}
+.rest-next-cue{
+  font-size:13px;color:rgba(255,255,255,.72);line-height:1.55;
+  padding:10px 14px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:12px;
+  text-align:left;
+}
+.rest-next-cue strong{color:white;font-weight:700}
+
+/* ── existing rest-screen div — now hidden, replaced by takeover ── */
+.rest-screen{display:none !important}
+
+/* ── Top row: kicker + badge (work mode) ── */
+.tracker-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.kicker{font-size:10px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.6px}
+.tracker-badge{font-size:10px;padding:4px 8px;transition:background .3s,color .3s}
+
+/* ── Exercise name ── */
+.g-title{
+  font-family:'DM Serif Display',serif;
+  font-size:26px;letter-spacing:-.3px;line-height:1.05;margin-top:4px;
+  transition:color .3s;
+}
+
+/* ── Weight + video row ── */
+.tracker-weight-row{display:flex;align-items:center;gap:7px;margin-top:8px;flex-wrap:wrap}
+.g-weight{background:var(--gold-lt);color:#7a5c1e;border-radius:12px;padding:5px 10px;font-size:12px;font-weight:900;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.g-video{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--ink);color:white;text-decoration:none;font-size:13px;font-weight:900}
+.inline-video-wrap{display:none;border-radius:14px;overflow:hidden;background:#000;position:relative;width:170px;aspect-ratio:9/16;flex-shrink:0}
+.inline-video-wrap.active{display:block}
+.inline-video-wrap iframe{width:100%;height:100%;border:0;display:block}
+.inline-video-badge{position:absolute;top:6px;left:6px;background:rgba(0,0,0,.55);color:#fff;font-size:9px;font-weight:800;padding:3px 7px;border-radius:999px;z-index:2;letter-spacing:.02em}
+
+/* ── guided-screen: default flow (ring only, centered) is unchanged; .video-active switches to a side-by-side video+ring row ── */
+.guided-screen{display:flex;flex-direction:column;align-items:center;position:relative}
+.guided-main-row{display:flex;flex-direction:column;align-items:center;width:100%}
+.ring-muscle-col{display:flex;flex-direction:column;align-items:center;width:150px}
+
+.g-muscle-row{display:none;flex-direction:column;align-items:center;gap:3px;margin:18px 0 0;text-align:center} /* generous top margin so the icon clears the ring below it */
+.g-muscle-row.show{display:flex}
+.g-muscle-icon svg{display:block;width:100px;height:auto}
+.g-muscle-name{font-size:16px;font-weight:900;color:var(--phase-dark);line-height:1.2}
+.g-muscle-precise{font-size:13px;font-weight:600;color:var(--muted);line-height:1.2;margin-top:1px}
+
+/* rest mode swaps the whole card to a dark navy takeover background (see .guided.rest-mode below) —
+   these need light/cream text, not a darker blue, or they disappear against it */
+.guided.rest-mode .g-muscle-name{color:#fff !important;text-shadow:0 1px 6px rgba(0,0,0,.3)}
+.guided.rest-mode .g-muscle-precise{color:rgba(255,255,255,.75) !important}
+
+.g-weight-prog{display:none;flex-direction:column;align-items:center;gap:2px;margin-top:auto;text-align:center} /* margin-top:auto pins this to the bottom of the stretched column, level with the video's bottom edge */
+.g-weight-prog.show{display:flex}
+.g-blockbar{letter-spacing:1px;font-size:15px;color:var(--phase-dark);font-weight:800}
+.g-target{font-size:12px;font-weight:600;color:var(--muted)}
+.guided.rest-mode .g-blockbar{color:#fff !important;text-shadow:0 1px 6px rgba(0,0,0,.3)}
+.guided.rest-mode .g-target{color:rgba(255,255,255,.75) !important}
+
+.g-cue-text{display:none;margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--phase-lt);color:var(--phase-dark);font-size:13px;font-weight:600;line-height:1.4;text-align:center}
+.g-cue-text.show{display:block}
+.guided.rest-mode .g-cue-text{background:rgba(255,255,255,.12) !important;color:#fff !important;text-shadow:0 1px 6px rgba(0,0,0,.25)}
+
+.guided-screen.video-active .guided-main-row{
+  flex-direction:row;
+  align-items:stretch; /* video and the ring+muscle+weight column become the same height, so content can be pinned to a shared bottom edge */
+  justify-content:center;
+  gap:12px;
+}
+.guided-screen.video-active .timer-ring-wrap{
+  width:118px;height:118px;
+  margin:6px 0 0; /* sits "up", near the top of the video rather than vertically centered */
+}
+.guided-screen.video-active .timer-ring{
+  width:118px;height:118px;
+  box-shadow:inset 0 0 0 10px rgba(255,255,255,.8), 0 6px 18px rgba(42,38,34,.15);
+}
+.guided-screen.video-active .g-timer{font-size:30px}
+
+.state-pill{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  margin:14px auto 0;
+  width:fit-content;
+  padding:7px 22px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:.8px;
+  text-transform:uppercase;
+  background:var(--phase);
+  color:white;
+  transition:background .3s, transform .2s;
+}
+.state-pill.rest{background:var(--rest-ring)}
+.state-pill .dot{
+  width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.65);
+  animation:dotPulse 1s ease-in-out infinite alternate;
+}
+.state-pill.paused .dot{animation:none;background:rgba(255,255,255,.35)}
+@keyframes dotPulse{from{opacity:.5;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+
+/* ── RING (conic-gradient progress) ── */
+.timer-ring-wrap{
+  position:relative;
+  margin:12px auto 0;
+  width:158px;height:158px;
+  flex-shrink:0;
+  transition:margin-top .25s;
+}
+.timer-ring{
+  width:158px;height:158px;
+  border-radius:50%;
+  background:conic-gradient(var(--phase) 0%, color-mix(in srgb,var(--phase) 16%,white) 0);
+  display:grid;place-items:center;
+  box-shadow:inset 0 0 0 14px rgba(255,255,255,.8), 0 6px 22px rgba(42,38,34,.1);
+  transition:border-radius .3s, box-shadow .3s;
+  cursor:pointer;
+}
+.timer-ring:active{transform:scale(.97)}
+.guided.rest-mode .timer-ring{
+  border-radius:30px !important;
+  box-shadow:inset 0 0 0 14px rgba(255,255,255,.8), 0 6px 22px rgba(44,95,134,.14);
+}
+
+/* ── Number inside ring ── */
+.g-timer{
+  font-size:62px;
+  font-weight:900;
+  color:var(--phase-dark);
+  line-height:1;
+  font-variant-numeric:tabular-nums;
+  pointer-events:none;
+  transition:color .3s;
+  display:block;
+}
+.guided.rest-mode .g-timer{color:var(--rest-dark)}
+
+/* Number pulse on final 5s */
+.guided.work-pulse .g-timer,
+.guided.rest-mode.rest-pulse .g-timer{animation:numberPulse .6s ease-in-out infinite alternate}
+@keyframes numberPulse{from{transform:scale(1)}to{transform:scale(1.1)}}
+
+/* Ring pulse on final 5s */
+.guided.work-pulse .timer-ring{animation:workFinalPulse .65s ease-in-out infinite alternate}
+@keyframes workFinalPulse{
+  from{box-shadow:inset 0 0 0 14px rgba(255,255,255,.8);transform:scale(1)}
+  to{box-shadow:inset 0 0 0 14px rgba(255,255,255,.8),0 0 0 6px color-mix(in srgb,var(--phase) 28%,transparent);transform:scale(1.025)}
+}
+.guided.rest-mode.rest-pulse .timer-ring{animation:restFinalPulse .65s ease-in-out infinite alternate}
+@keyframes restFinalPulse{
+  from{transform:scale(1);box-shadow:inset 0 0 0 14px rgba(255,255,255,.8),0 6px 22px rgba(44,95,134,.14)}
+  to{transform:scale(1.025);box-shadow:inset 0 0 0 14px rgba(255,255,255,.8),0 0 0 6px rgba(74,144,194,.28)}
+}
+
+/* Pop on work start */
+.guided.work-start-pop .timer-ring{animation:workStartPop .32s ease-out}
+@keyframes workStartPop{0%{transform:scale(.96)}50%{transform:scale(1.07)}100%{transform:scale(1)}}
+
+/* GO! flash overlay */
+.go-flash{
+  position:absolute;inset:0;border-radius:50%;
+  display:none;place-items:center;
+  background:var(--phase);color:white;
+  font-size:28px;font-weight:900;letter-spacing:1px;
+  z-index:4;pointer-events:none;
+}
+.go-flash.active{display:grid;animation:goPop .42s ease-out forwards}
+@keyframes goPop{0%{opacity:0;transform:scale(.8)}35%{opacity:1;transform:scale(1.08)}100%{opacity:0;transform:scale(1)}}
+
+/* ── COUNTDOWN OVERLAY (3-2-1 between rest and work) ── */
+.countdown-overlay{
+  position:absolute;inset:0;border-radius:50%;
+  display:none;place-items:center;
+  background:var(--phase);
+  z-index:5;pointer-events:none;
+}
+.countdown-overlay.active{display:grid}
+.countdown-num{
+  font-size:70px;font-weight:900;color:white;line-height:1;
+  animation:countPop 1.4s ease-out forwards;
+}
+@keyframes countPop{
+  0%{transform:scale(1.3);opacity:0}
+  15%{transform:scale(1);opacity:1}
+  92%{transform:scale(1);opacity:1}
+  100%{transform:scale(.9);opacity:0}
+}
+
+/* ── Meta pills row ── */
+.tracker-meta{display:flex;justify-content:center;gap:6px;margin-top:12px;flex-wrap:wrap}
+.tracker-meta span{
+  background:white;
+  border:1px solid color-mix(in srgb,var(--phase) 25%,white);
+  color:var(--phase-dark);border-radius:999px;
+  padding:5px 10px;font-size:12px;font-weight:900;
+  transition:color .3s,border-color .3s;
+}
+.guided.rest-mode .tracker-meta span{color:var(--rest-dark) !important;border-color:#b7d2e6 !important}
+
+/* ── ROUND DOTS ── */
+.round-dots{display:inline-flex;gap:5px;align-items:center;justify-content:center;vertical-align:middle}
+.rdot{
+  width:10px;height:10px;border-radius:50%;
+  background:color-mix(in srgb,var(--phase) 20%,white);
+  border:1.5px solid color-mix(in srgb,var(--phase) 40%,white);
+  transition:background .3s,transform .2s;
+}
+.rdot.done{background:var(--phase);border-color:var(--phase)}
+.rdot.current{background:var(--phase);border-color:var(--phase);transform:scale(1.3);box-shadow:0 0 6px color-mix(in srgb,var(--phase) 50%,transparent)}
+.guided.rest-mode .rdot{border-color:#b7d2e6}
+.guided.rest-mode .rdot.done,.guided.rest-mode .rdot.current{background:var(--rest-ring);border-color:var(--rest-ring)}
+
+/* ── Session progress bar ── */
+.tracker-progress{
+  height:7px;
+  background:rgba(255,255,255,.75);
+  border:1px solid color-mix(in srgb,var(--phase) 25%,white);
+  border-radius:999px;overflow:hidden;margin:10px 4px 0;
+}
+.tracker-fill{height:100%;background:var(--phase);border-radius:999px;transition:.3s}
+.guided.rest-mode .tracker-fill{background:var(--rest-ring) !important}
+
+/* ── Next up (work mode footer only) ── */
+.g-next{
+  border-top:1px solid color-mix(in srgb,var(--phase) 30%,white);
+  margin-top:10px;padding-top:8px;
+  color:var(--muted);font-size:12px;text-align:center;
+}
+.guided.rest-mode .g-next{display:none}
+
+/* ── Wake lock indicator — button highlights when enabled ── */
+
+/* ── CONTROLS ROW ── */
+.gc-row{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:6px;
+  margin-top:10px;
+}
+.gc-row .gc-group{
+  display:flex;gap:4px;justify-content:center;flex-wrap:wrap;
+}
+.gc-btn{
+  border:none;border-radius:999px;
+  padding:7px 10px;font-size:11px;font-weight:900;
+  cursor:pointer;background:#f0ece6;color:var(--muted);
+  white-space:nowrap;
+  transition:background .18s,color .18s;
+}
+.gc-btn:active{opacity:.8}
+.gc-btn.primary{background:var(--phase);color:white;padding:7px 18px}
+.guided.rest-mode .gc-btn.primary{background:var(--rest-ring)}
+.gc-btn.icon{width:34px;height:34px;padding:0;display:grid;place-items:center;font-size:14px}
+.gc-btn.icon.active{background:var(--phase);color:white;box-shadow:0 0 0 2px color-mix(in srgb,var(--phase) 35%,white)}
+.guided.rest-mode .gc-btn.icon.active{background:var(--rest-ring);box-shadow:0 0 0 2px rgba(74,144,194,.3)}
+
+/* play/pause big button */
+.play-btn{
+  width:100%;
+  padding:11px;
+  border:none;border-radius:14px;
+  font-size:14px;font-weight:900;
+  background:var(--phase);color:white;
+  cursor:pointer;margin-top:8px;
+  transition:background .25s,transform .15s;
+  letter-spacing:.3px;
+}
+.play-btn:active{transform:scale(.98)}
+.guided.rest-mode .play-btn{background:var(--rest-ring)}
+
+.finish-btn{
+  width:100%;padding:10px;border:none;border-radius:14px;
+  font-size:12px;font-weight:900;
+  background:var(--ink);color:white;
+  cursor:pointer;margin-top:6px;
+}
+.finish-btn:active{opacity:.85}
+
+/* ── TABS ── */
+.tabs{display:flex;background:white;border-bottom:2px solid var(--border);position:sticky;top:0;z-index:20}
+.tab{flex:1;border:none;background:white;padding:11px 3px;color:var(--muted);font-weight:900;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;font-size:13px}
+.tab.active{color:var(--phase-dark);border-bottom-color:var(--phase)}
+.tab span{font-size:10px;font-weight:400;display:block}
+
+/* ── WORKOUT PANELS ── */
+.panel{display:none}.panel.active{display:block}
+.whead{padding:14px 12px 8px}
+.wtitle{font-family:'DM Serif Display',serif;font-size:21px}
+.meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.progress{padding:0 12px 10px}
+.pline{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:4px}
+.track{height:8px;background:var(--border);border-radius:999px;overflow:hidden}
+.fill{height:100%;background:var(--phase)}
+
+/* ── CIRCUITS ── */
+.circuit{margin:0 12px 10px;border:1.5px solid var(--border);border-radius:16px;overflow:hidden;background:white}
+.circuit summary{list-style:none;cursor:pointer;padding:12px 13px;display:flex;justify-content:space-between;align-items:center}
+.circuit summary:after{content:'⌄';font-size:18px;color:var(--muted)}
+.circuit[open] summary:after{transform:rotate(180deg)}
+.clabel{display:flex;gap:9px;align-items:center}
+.num{width:29px;height:29px;border-radius:50%;display:grid;place-items:center;background:var(--phase-lt);color:var(--phase-dark);font-weight:900}
+.cname{font-weight:900}
+.csub{font-size:11px;color:var(--muted)}
+.cbody{border-top:1px solid var(--border);padding:0 11px 11px}
+
+/* ── EXERCISES ── */
+.exercise{display:grid;grid-template-columns:25px 1fr;gap:10px;padding:11px 0;border-bottom:1px solid var(--border)}
+.exercise:last-child{border-bottom:none}
+.check{appearance:none;width:22px;height:22px;border:2px solid var(--border);border-radius:7px;margin-top:2px;cursor:pointer}
+.check:checked{background:var(--phase);border-color:var(--phase)}
+.check:checked:after{content:'✓';color:white;font-weight:900;display:block;text-align:center;line-height:18px}
+.exercise.done .ename{text-decoration:line-through;color:var(--muted)}
+.ename{font-weight:900}
+.echips{display:flex;gap:5px;flex-wrap:wrap;margin:5px 0}
+.weight{background:var(--gold-lt);color:#7a5c1e;border-radius:999px;padding:3px 8px;font-size:11px;font-weight:900}
+.muscle-block{display:flex;align-items:flex-start;gap:8px;margin:8px 0 4px;flex-wrap:wrap}
+.muscle-svg{flex-shrink:0;display:block}
+.muscle-name{font-size:11px;font-weight:900;color:var(--phase-dark);line-height:1.3;margin-top:4px}
+.muscle-precise{font-size:10px;color:var(--muted);font-weight:400;line-height:1.4;margin-top:2px}
+.dr-check{display:inline-flex;align-items:center;gap:4px;background:#fff8e1;color:#7a5c00;border:1px solid #f0c040;border-radius:999px;padding:3px 8px;font-size:11px;font-weight:900;margin-top:4px}
+.knee-check{display:inline-flex;align-items:center;gap:4px;background:#eef0ff;color:#3a3aaa;border:1px solid #aab0ee;border-radius:999px;padding:3px 8px;font-size:11px;font-weight:900;margin-top:4px}
+.wrist-check{display:inline-flex;align-items:center;gap:4px;background:#f0ebf8;color:#4a2080;border:1px solid #b09ad0;border-radius:999px;padding:3px 8px;font-size:11px;font-weight:900;margin-top:4px}
+.dr-cue{font-size:11px;color:#7a5c00;margin-top:4px;padding:5px 8px;background:#fff8e1;border-left:3px solid #f0c040;border-radius:0 6px 6px 0;line-height:1.45}
+.knee-cue{font-size:11px;color:#3a3aaa;margin-top:4px;padding:5px 8px;background:#eef0ff;border-left:3px solid #aab0ee;border-radius:0 6px 6px 0;line-height:1.45}
+.wrist-cue{font-size:11px;color:#4a2080;margin-top:4px;padding:5px 8px;background:#f0ebf8;border-left:3px solid #b09ad0;border-radius:0 6px 6px 0;line-height:1.45}
+.cue{font-size:12px;color:var(--muted);margin-top:5px}
+.video{display:inline-flex;margin-top:7px;background:var(--ink);color:white;text-decoration:none;border-radius:999px;padding:6px 9px;font-size:11px;font-weight:900}
+.weight-prog{margin-top:7px;display:grid;gap:4px}
+.prog-line{font-size:11px;color:var(--phase-dark);font-weight:900}
+.blockbar{letter-spacing:1px;color:var(--phase-dark);font-size:12px}
+.target{font-size:11px;color:var(--muted)}
+
+/* ── ROADMAP ── */
+.roadmap{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.road{border:1.5px solid var(--border);border-radius:14px;background:white;padding:10px}
+.road.active{border-color:var(--phase);background:var(--phase-lt)}
+.road h4{font-size:13px;color:var(--phase-dark);margin-bottom:5px}
+.road ul{padding-left:16px;font-size:11px;color:var(--muted)}
+.road .weights{margin-top:6px;font-size:11px;font-weight:900;color:var(--phase-dark)}
+
+/* ── PROGRESS CARDS ── */
+.progress-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.progress-card{border:1.5px solid var(--border);border-radius:14px;background:white;padding:10px}
+.progress-card b{display:block;color:var(--phase-dark);font-size:13px}
+.progress-card span{display:block;font-size:12px;color:var(--muted);margin-top:4px}
+.pct{font-weight:900;color:var(--phase-dark) !important}
+
+/* ── FOOTER ── */
+.footer{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:16px 12px 30px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:760px){
+  .dashboard{grid-template-columns:repeat(3,1fr)}
+  .dash{padding:8px 6px;text-align:center}
+  .dash-value{font-size:16px}
+  .roadmap{grid-template-columns:repeat(2,1fr)}
+  .progress-grid{grid-template-columns:1fr}
+  .timer-ring-wrap,.timer-ring{width:148px;height:148px}
+  .g-timer{font-size:56px}
+  .g-title{font-size:22px}
+}
+
+/* ── LANDSCAPE / PROPPED-PHONE TIMER MODE ──
+   When the phone is rotated sideways (typical when propped up during a set),
+   hide everything except the guided timer, blown up to fill the screen with
+   minimal chrome: big ring, exercise name, play control. */
+@media(orientation:landscape) and (max-height:500px){
+  .header,.ribbon,.app>.section:not(.timer-section),
+  .tabs,#workouts,.footer{display:none !important}
+
+  body{overflow:hidden}
+  .app{padding:0;max-width:100%}
+  .timer-section{padding:0}
+
+  .guided{
+    border-radius:0;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:10px 16px;
+  }
+
+  .tracker-head{width:100%;max-width:520px}
+  .g-title{font-size:20px}
+  .kicker{font-size:9px}
+  .tracker-weight-row{margin-top:4px}
+  .g-weight{font-size:11px}
+
+  .state-pill{margin:8px auto 0;padding:5px 16px;font-size:11px}
+
+  .timer-ring-wrap,.timer-ring{width:150px;height:150px}
+  .g-timer{font-size:54px}
+
+  .tracker-meta{margin-top:8px}
+  .tracker-progress{margin-top:6px;max-width:300px}
+  .g-next{font-size:11px;margin-top:6px;padding-top:6px}
+
+  /* rest takeover: shrink breathing circle, keep next-exercise text readable */
+  .rest-takeover{padding:0}
+  .breath-wrap{width:100px;height:100px;margin-bottom:8px}
+  .breath-ring-mid{width:75px;height:75px}
+  .breath-disc{width:50px;height:50px}
+  .breath-arrow{font-size:26px}
+  .rest-next-name{font-size:22px}
+  .rest-strip-timer{font-size:22px;padding:3px 10px}
+
+  /* controls: keep compact, single row, always visible */
+  .gc-row{width:100%;max-width:420px;margin-top:10px}
+  .finish-btn{max-width:420px;margin-top:6px;padding:8px;font-size:11px}
+}
+
+/* ── UNDO TOAST ── */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);
+  background:var(--ink);color:white;
+  border-radius:14px;padding:12px 16px;
+  display:flex;align-items:center;gap:12px;
+  font-size:13px;font-weight:600;
+  box-shadow:0 8px 28px rgba(0,0,0,.28);
+  z-index:90;
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .3s;
+  opacity:0;pointer-events:none;
+  white-space:nowrap;
+  max-width:calc(100vw - 32px);
+}
+.toast.visible{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto}
+.toast-msg{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.toast-undo{
+  border:none;background:var(--phase);color:white;
+  border-radius:8px;padding:5px 10px;
+  font-size:12px;font-weight:900;cursor:pointer;
+  flex-shrink:0;white-space:nowrap;
+}
+.toast-undo:active{opacity:.8}
+.toast-close{
+  border:none;background:none;color:rgba(255,255,255,.55);
+  font-size:16px;cursor:pointer;padding:0 0 0 4px;flex-shrink:0;
+}
+
+/* ── PRINT-FRIENDLY WORKOUT CARD ── */
+.print-card{display:none}
+/* ── CUSTOM CONFIRM MODAL ── */
+.modal-overlay{
+  display:none;
+  position:fixed;inset:0;
+  background:rgba(42,38,34,.55);
+  z-index:100;
+  align-items:center;justify-content:center;
+  padding:24px;
+}
+.modal-overlay.active{display:flex}
+.modal-box{
+  background:white;border-radius:18px;
+  padding:20px;max-width:340px;width:100%;
+  box-shadow:0 20px 50px rgba(0,0,0,.25);
+  animation:modalPop .2s ease-out;
+}
+@keyframes modalPop{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+.modal-message{font-size:14px;line-height:1.5;color:var(--ink);margin-bottom:16px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end}
+.modal-actions .btn{padding:9px 16px;font-size:13px}
+
+@media print{
+  /* hide everything except the dedicated print card */
+  body *{display:none !important}
+  .print-card{display:block !important}
+  .print-card *{display:revert !important}
+  body{background:white;color:#000;font-size:12px}
+
+  .pc-header{text-align:center;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom:10px}
+  .pc-header h1{font-family:'DM Serif Display',serif;font-size:24px}
+  .pc-header p{font-size:11px;color:#444;margin-top:3px}
+  .pc-meta{display:flex;justify-content:center;gap:14px;font-size:11px;font-weight:700;margin-top:6px}
+
+  .pc-circuit{margin-bottom:12px;page-break-inside:avoid}
+  .pc-circuit-title{font-weight:900;font-size:14px;border-bottom:1px solid #999;padding-bottom:3px;margin-bottom:6px}
+  .pc-ex{display:grid;grid-template-columns:18px 1fr auto;gap:8px;padding:5px 0;border-bottom:1px solid #eee;align-items:start}
+  .pc-ex .pc-box{width:13px;height:13px;border:1.5px solid #000;margin-top:2px}
+  .pc-ex-name{font-weight:700;font-size:12px}
+  .pc-ex-cue{font-size:10px;color:#444;margin-top:2px}
+  .pc-ex-weight{font-size:11px;font-weight:700;white-space:nowrap}
+
+  .pc-footer{margin-top:16px;font-size:10px;color:#555;border-top:1px solid #999;padding-top:8px}
+}
+</style>
+</head>
+<body class="phase-1">
+
+<div class="header">
+  <h1>Mama <em>Moves</em></h1>
+  <p>v12 · Core &amp; Upper · new circuits · Strong tempo</p>
+</div>
+<div class="ribbon" id="ribbon">🌱 Foundation · breathing, technique, consistency</div>
+
+<!-- PRINT-ONLY WORKOUT CARD (populated dynamically before printing) -->
+<div class="print-card" id="printCard"></div>
+
+<div class="app">
+
+<!-- DASHBOARD -->
+<section class="section">
+  <div class="section-title">Dashboard</div>
+  <div class="dashboard">
+    <div class="dash"><div class="dash-label">Mum Level</div><div class="dash-value" id="mumLevel">Recovering</div><div class="dash-note" id="levelNote">Build base</div></div>
+    <div class="dash"><div class="dash-label">Training</div><div class="dash-value"><span id="modeName">Standard</span></div><div class="dash-note" id="modeNote">~25 min</div></div>
+    <div class="dash"><div class="dash-label">Today</div><div class="dash-value" id="nextWorkout">Glute</div><div class="dash-note" id="todayMini">Glute Power</div></div>
+  </div>
+</section>
+
+<!-- MISSION -->
+<section class="section">
+  <div class="mission">
+    <h3>🎯 Today's Mission</h3>
+    <div class="mission-main" id="missionName">Glute Power</div>
+    <div class="mission-row">
+      <span class="badge gold" id="missionTime">~25 min</span>
+      <span class="badge" id="missionStructure">2 circuits × 2 rounds</span>
+      <span class="badge soft" id="missionGoal">Lower body strength + core</span>
+    </div>
+  </div>
+</section>
+
+<!-- PHASE SESSION PROGRESS -->
+<section class="section">
+  <div class="session-card">
+    <div class="session-head">
+      <span class="session-label" id="sessionLabel">Phase 1 progress</span>
+      <span class="session-count" id="sessionCount">0 / 8 sessions</span>
+    </div>
+    <div class="session-track">
+      <div class="session-fill" id="sessionFill" style="width:0%"></div>
+    </div>
+    <div class="session-foot">
+      <div class="session-note" id="sessionNote">Complete 8 sessions to unlock Phase 2</div>
+      <button class="session-reset" onclick="resetPhaseSessions()">↺ Reset this phase's count</button>
+    </div>
+  </div>
+</section>
+
+<!-- PHASE UNLOCK BANNER -->
+<section class="section" id="unlockSection" style="display:none">
+  <div class="unlock-banner">
+    <div class="unlock-icon">🎉</div>
+    <div class="unlock-text">
+      <div class="unlock-title" id="unlockTitle">Ready for Phase 2?</div>
+      <div class="unlock-sub" id="unlockSub">You've completed 12 sessions in Phase 1</div>
+    </div>
+    <div class="unlock-actions">
+      <button class="btn phase" onclick="confirmPhaseUnlock()">Level up →</button>
+      <button class="btn secondary" onclick="dismissPhaseUnlock()">Not yet</button>
+    </div>
+  </div>
+</section>
+
+<!-- BACKUP REMINDER BANNER -->
+<section class="section" id="backupReminderSection" style="display:none">
+  <div class="backup-banner">
+    <div class="unlock-icon">💾</div>
+    <div class="unlock-text">
+      <div class="unlock-title">You've got real progress now</div>
+      <div class="unlock-sub">Export a backup so it's never lost if you switch phones or clear your browser</div>
+    </div>
+    <div class="unlock-actions">
+      <button class="btn phase" onclick="exportBackup();dismissBackupReminder()">⬇ Export now</button>
+      <button class="btn secondary" onclick="dismissBackupReminder()">Later</button>
+    </div>
+  </div>
+</section>
+
+<!-- CONTROLS -->
+<section class="section">
+  <details class="details" open>
+    <summary>⚙️ Controls</summary>
+    <div class="details-body">
+      <div class="controls">
+        <div class="mini"><span>Phase</span>
+          <button class="pill active" data-phase="1" onclick="setPhase(1)">1</button>
+          <button class="pill" data-phase="2" onclick="setPhase(2)">2</button>
+          <button class="pill" data-phase="3" onclick="setPhase(3)">3</button>
+          <button class="pill" data-phase="4" onclick="setPhase(4)">4</button>
+        </div>
+        <div class="mini"><span>Mode</span>
+          <button class="pill" data-mode="express" onclick="setMode('express')">Express</button>
+          <button class="pill active" data-mode="standard" onclick="setMode('standard')">Standard</button>
+          <button class="pill" data-mode="complete" onclick="setMode('complete')">Complete</button>
+        </div>
+        <div class="mini"><span>Tempo</span>
+          <button class="pill" data-energy="green" onclick="setEnergy('green')">🟢 Gentle</button>
+          <button class="pill active" data-energy="yellow" onclick="setEnergy('yellow')">🟡 Strong</button>
+        </div>
+        <div class="mini">
+          <button class="btn phase" onclick="savePause()">👶 Pause</button>
+          <button class="btn secondary" onclick="resumePause()">Resume</button>
+        </div>
+        <div class="mini"><span>Extras</span>
+          <button class="pill" id="warmupToggle" onclick="toggleWarmup()">🌅 Warm-up</button>
+          <button class="pill" id="cooldownToggle" onclick="toggleCooldown()">🌙 Cool-down</button>
+        </div>
+      </div>
+      <p class="small" id="controlNote" style="margin-top:8px">Standard is the default: 2 circuits × 2 rounds.</p>
+    </div>
+  </details>
+</section>
+
+<!-- GUIDED TIMER — v9 -->
+<section class="section timer-section">
+<div class="guided app-tracker">
+
+  <!-- WORK MODE: kicker + title + weight + pill + ring + meta + progress + next -->
+  <div class="tracker-head">
+    <div>
+      <div class="kicker" id="gKicker">Glute Power · C1 · R1</div>
+      <div class="g-title" id="gTitle">Goblet Squat</div>
+    </div>
+    <span class="badge tracker-badge" id="gBadge">Standard</span>
+  </div>
+
+  <div class="tracker-weight-row">
+    <span class="g-weight" id="gWeight">5 kg total • Legs</span>
+    <a class="g-video" id="gVideo" href="#" target="_blank" rel="noopener">▶</a>
+  </div>
+
+  <div class="guided-screen" id="guidedScreen">
+
+    <div class="state-pill" id="statePill">
+      <span class="dot"></span>
+      <span id="stateLabel">TAP TO START</span>
+    </div>
+
+    <div class="guided-main-row" id="guidedMainRow">
+
+      <div class="inline-video-wrap" id="inlineVideoWrap">
+        <span class="inline-video-badge">TEST · auto-play</span>
+        <iframe id="inlineVideoFrame" src="" allow="autoplay; encrypted-media" allowfullscreen title="Exercise demo"></iframe>
+      </div>
+
+      <div class="ring-muscle-col" id="ringMuscleCol">
+        <div class="timer-ring-wrap" id="timerRingWrap">
+          <div class="go-flash" id="goFlash">GO!</div>
+          <div class="countdown-overlay" id="countdownOverlay"><span class="countdown-num" id="countdownNum">3</span></div>
+          <div class="timer-ring" id="timerRing" onclick="toggleGuidedTimer()" role="button" aria-label="Start or pause timer">
+            <span class="g-timer" id="gTimer">40</span>
+          </div>
+        </div>
+
+        <div class="g-muscle-row" id="gMuscleRow">
+          <span class="g-muscle-icon" id="gMuscleIcon"></span>
+          <div class="g-muscle-name" id="gMuscleName"></div>
+          <div class="g-muscle-precise" id="gMusclePrecise"></div>
+        </div>
+
+        <div class="g-weight-prog" id="gWeightProg">
+          <div class="g-blockbar" id="gBlockbar"></div>
+          <div class="g-target" id="gTarget"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="g-cue-text" id="gCueText"></div>
+
+  </div>
+
+  <div class="tracker-meta">
+    <span id="gCircuit">C1/2</span>
+    <span class="round-dots" id="roundDots"></span>
+    <span id="gExercise">E1/4</span>
+  </div>
+
+  <div class="tracker-progress">
+    <div class="tracker-fill" id="trackerFill" style="width:0%"></div>
+  </div>
+
+  <div class="g-next" id="gNext">Next: Romanian Deadlift</div>
+
+  <!-- REST TAKEOVER: replaces everything above during rest -->
+  <div class="rest-takeover" id="restTakeover">
+
+    <!-- Top strip: REST label | countdown | NEXT label -->
+    <div class="rest-strip">
+      <div class="rest-strip-label">Resting</div>
+      <div class="rest-strip-timer" id="restTimer">20</div>
+      <div class="rest-strip-next">Up next ↓</div>
+    </div>
+
+    <!-- Breathing circle -->
+    <div class="breath-wrap">
+      <div class="breath-ring"></div>
+      <div class="breath-ring-mid"></div>
+      <div class="breath-disc" id="breathDisc">
+        <span class="breath-arrow" id="breathArrow">↑</span>
+      </div>
+    </div>
+
+    <!-- Next exercise -->
+    <div class="rest-next-label">Coming up next</div>
+    <div class="rest-next-name" id="restNextName">—</div>
+    <div class="rest-next-chips">
+      <span class="rest-chip w" id="restNextWeight">—</span>
+      <span class="rest-chip m" id="restNextMuscle">—</span>
+    </div>
+    <div class="rest-next-cue" id="restNextCue">—</div>
+
+  </div><!-- /rest-takeover -->
+
+  <!-- Controls row -->
+  <div class="gc-row">
+    <div class="gc-group">
+      <button class="gc-btn icon" onclick="guidedPrev()" title="Previous">⏮</button>
+      <button class="gc-btn icon" onclick="guidedNextStep()" title="Skip">⏭</button>
+    </div>
+    <div class="gc-group">
+      <button class="gc-btn primary" onclick="toggleGuidedTimer()" id="playPauseBtn">▶ Start</button>
+    </div>
+    <div class="gc-group">
+      <button class="gc-btn icon" onclick="guidedReset()" title="Reset">↺</button>
+      <button class="gc-btn icon" id="quietBtn" onclick="toggleQuietMode()" title="Sound on/off">🔊</button>
+      <button class="gc-btn icon" id="wakeBtn" onclick="toggleWakeLock()" title="Screen can sleep — tap to keep awake during workout">😴</button>
+    </div>
+  </div>
+
+  <button class="finish-btn" onclick="finishWorkout()">✓ Mark workout complete</button>
+
+</div>
+</section>
+
+<!-- ROADMAP -->
+<section class="section">
+  <details class="details">
+    <summary>🗺️ Phase Roadmap</summary>
+    <div class="details-body"><div class="roadmap" id="roadmap"></div></div>
+  </details>
+</section>
+
+<!-- REAL PROGRESS -->
+<section class="section">
+  <details class="details">
+    <summary>📈 Real Progress</summary>
+    <div class="details-body"><div class="progress-grid" id="realProgress"></div></div>
+  </details>
+</section>
+
+<!-- WORKOUT TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('glute')">Glute Power<span>Lower Body</span></button>
+  <button class="tab" onclick="switchTab('posture')">Core &amp; Upper<span>Upper + Core</span></button>
+  <button class="tab" onclick="switchTab('athlete')">Mum Athlete<span>Total Body</span></button>
+  <button class="tab" onclick="switchTab('build')">Build<span>Bear · Reverse Plank</span></button>
+</div>
+<div id="workouts"></div>
+
+<!-- SAFETY -->
+<section class="section">
+  <details class="details">
+    <summary>🌿 Postnatal Safety</summary>
+    <div class="details-body">
+      <p><b>The golden rule:</b> exhale on effort — every press, stand, row and lunge. This reduces intra-abdominal pressure and coordinates pelvic floor with your breath.</p>
+      <p style="margin-top:8px"><b>Stop and regress</b> if you notice: heaviness, leaking, pelvic pressure, doming or coning of the midline, dragging sensation, or any new pain.</p>
+    </div>
+  </details>
+</section>
+
+<div class="footer">
+  <button class="btn secondary" onclick="resetChecks()">Reset checkboxes</button>
+  <button class="btn secondary" onclick="resetProgramme()">Reset programme to Phase 1</button>
+  <button class="btn secondary" onclick="clearData()">Clear saved data</button>
+  <button class="btn phase" onclick="exportBackup()">⬇ Export backup</button>
+  <button class="btn secondary" onclick="document.getElementById('importFile').click()">⬆ Import backup</button>
+  <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)">
+  <button class="btn phase" id="installBtn" onclick="handleInstallClick()" style="display:none">📲 Add to Home Screen</button>
+  <button class="btn phase" onclick="printWorkoutCard()">Print / Save PDF</button>
+</div>
+
+</div><!-- /app -->
+
+<!-- CUSTOM CONFIRM MODAL (replaces native confirm() which is silently blocked in some mobile/PWA contexts) -->
+<div class="modal-overlay" id="confirmOverlay">
+  <div class="modal-box">
+    <div class="modal-message" id="confirmMessage">Are you sure?</div>
+    <div class="modal-actions">
+      <button class="btn secondary" id="confirmCancelBtn" onclick="closeConfirm(false)">Cancel</button>
+      <button class="btn phase" id="confirmOkBtn" onclick="closeConfirm(true)">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const phaseInfo={
+  1:{emoji:'🌱',name:'Recovering Mum',focus:'breathing, technique, consistency',upper:'2–4 kg',lower:'4–7 kg',note:'Build consistency first. Complete mode is locked.'},
+  2:{emoji:'💪',name:'Active Mum',focus:'adding load',upper:'3–5 kg',lower:'6–9 kg',note:'Complete mode is optional.'},
+  3:{emoji:'🔥',name:'Strong Mum',focus:'tempo, pauses, definition',upper:'4–6 kg',lower:'8–12 kg',note:'All modes available.'},
+  4:{emoji:'👑',name:'Supermum',focus:'athletic strength, carries, resilience',upper:'5–8 kg',lower:'10–14 kg',note:'All modes available.'}
+};
+const modes={
+  express:{label:'Express',time:'~15 min',structure:'1 circuit × 2 rounds',circuits:1,rounds:2},
+  standard:{label:'Standard',time:'~25 min',structure:'2 circuits × 2 rounds',circuits:2,rounds:2},
+  complete:{label:'Complete',time:'~37 min',structure:'3 circuits × 2 rounds',circuits:3,rounds:2}
+};
+const video={
+  squat:'https://www.youtube.com/watch?v=F-AgwDMMBuc', // UNVERIFIED — fetch 429'd, verify when possible
+  sumo:'https://www.youtube.com/watch?v=sQ-lwJtpwUc', // UNVERIFIED — fetch 429'd, verify when possible
+  hip:'https://www.youtube.com/watch?v=7oZ_S73UdXU', // UNVERIFIED — fetch 429'd, verify when possible
+  curtsy:'https://www.instagram.com/reel/DBp-yQQOScx/?hl=en-gb', // UNVERIFIED — Instagram blocked from fetch tool entirely, taken on Laura's confirmation. Was wrongly sharing Reverse Lunge's video
+  bandedbridge:'https://www.youtube.com/shorts/itoiIYtRueM', // Mini Band Glute Bridge Pulse — Vie Athletics, 0:17 — was wrongly sharing Hip Thrust's video
+  bridgemarch:'https://www.youtube.com/shorts/_vGwIkEGMI8', // Loaded Glute Bridge March — was wrongly reusing the Hip Thrust video
+  band:'https://www.youtube.com/shorts/Cn49Q7B1S8c',
+  lunge:'https://www.youtube.com/shorts/ljZA17b52FE',rdl:'https://www.youtube.com/watch?v=CBOhr6H7BEY', // UNVERIFIED — fetch 429'd, verify when possible
+  singlerdl:'https://www.youtube.com/watch?v=7zHga4ZgfaI', // UNVERIFIED — fetch 429'd, verify when possible. Was wrongly sharing Romanian Deadlift's video
+  deadbug:'https://www.youtube.com/shorts/RLuouBpMtGI',
+  pullapart:'https://www.youtube.com/shorts/qi2y-eI_kuI',press:'https://www.youtube.com/shorts/aedn4SSc3Ww',
+  row:'https://www.youtube.com/shorts/vN8xskk-7G8',floor:'https://www.youtube.com/shorts/uqA6mNN46ow',
+  raise:'https://www.youtube.com/shorts/nQvOYOX2qAA',carry:'https://www.youtube.com/shorts/rt17lmnaLSM',
+  // new exercises
+  heeldrop:'https://www.youtube.com/shorts/WBqZcsAMIE4',
+  birdext:'https://www.youtube.com/shorts/ASdvN_XEl_c',
+  bearhold:'https://www.youtube.com/shorts/bfGIlM0Elbo',
+  bearkneehigh:'https://www.youtube.com/shorts/bfGIlM0Elbo',
+  bearleg:'https://www.youtube.com/shorts/0jB1ZWv9Gy8',
+  bearpickup:'https://www.youtube.com/shorts/oefpN_eE01M',
+  beartwist:'https://www.youtube.com/shorts/oefpN_eE01M',
+  revplankbent:'https://www.youtube.com/shorts/fv6EfDZ0E28',
+  revplank:'https://www.youtube.com/shorts/fv6EfDZ0E28',
+  kickback:'https://www.youtube.com/shorts/PPJGAOUrbOs',
+  copenhagen:'https://www.youtube.com/shorts/RmnC8F6aAtM',
+  woodchop:'https://www.youtube.com/shorts/OgQU_bbdB7c',
+  suitcase:'https://www.youtube.com/shorts/C8c7x2Xmq80',
+  sideplank:'https://www.youtube.com/shorts/HyAct6eyrvg', // Forearm Side Plank Progressions
+  trikick:'https://www.youtube.com/shorts/3Bv1n7-DN7c', // Dumbbell Tricep Kickback
+  inclinepush:'https://www.youtube.com/shorts/ZZ6FLakg68k', // How to do incline push ups
+  bulgarian:'https://www.youtube.com/watch?v=Us52wOAui2Q', // UNVERIFIED — fetch 429'd, verify when possible
+  lungeknee:'https://www.youtube.com/shorts/8_LD0WinwwU', // Reverse Lunge to Knee Drive — Dynamic Runner, 0:21, exact title match
+};
+// flags: dr=diastasis self-check, knee=IT band/knee note, wrist=wrist loading note
+function ex(id,name,weights,unit,muscle,cue,vid,target,{dr=false,knee=false,wrist=false,shortCue=''}={}){
+  return{id,name,weights,unit,muscle,cue,video:video[vid]||'',target,dr,knee,wrist,shortCue}
+}
+
+// ── ANATOMICAL MUSCLE SVG SYSTEM ──
+// Builds a small 48×72 body silhouette with highlighted muscle regions
+// Front and back views, all inline SVG — no external dependencies
+(function(){
+  const B='#d4cfc8',O='#9e948c',H='#e85d3a';
+
+  const frontBase=`
+    <ellipse cx="24" cy="6.5" rx="5" ry="5.5" fill="${B}" stroke="${O}" stroke-width=".9"/>
+    <rect x="21.5" y="11.5" width="5" height="3.5" rx="1" fill="${B}" stroke="${O}" stroke-width=".9"/>
+    <path d="M15,15 Q12,18 12,28 L12,42 Q12,44 14,44 L34,44 Q36,44 36,42 L36,28 Q36,18 33,15 Z" fill="${B}" stroke="${O}" stroke-width=".9"/>
+    <path d="M15,16 Q10,19 9,27 Q8,33 9,36 Q11,38 13,36 Q14,33 14,28 L15,20 Z" fill="${B}" stroke="${O}" stroke-width=".9"/>
+    <path d="M33,16 Q38,19 39,27 Q40,33 39,36 Q37,38 35,36 Q34,33 34,28 L33,20 Z" fill="${B}" stroke="${O}" stroke-width=".9"/>
+    <path d="M15,44 Q13,49 13,56 Q13,62 15,63 Q18,65 19,62 Q20,57 20,53 L20,44 Z" fill="${B}" stroke="${O}" stroke-width=".9"/>
+    <path d="M33,44 Q35,49 35,56 Q35,62 33,63 Q30,65 29,62 Q28,57 28,53 L28,44 Z" fill="${B}" stroke="${O}" stroke-width=".9"/>
+    <path d="M14,63 Q13,67 14,70 Q15,72 17,71 Q18,69 18,66 L18,62 Z" fill="${B}" stroke="${O}" stroke-width=".9"/>
+    <path d="M34,63 Q35,67 34,70 Q33,72 31,71 Q30,69 30,66 L30,62 Z" fill="${B}" stroke="${O}" stroke-width=".9"/>`;
+
+  // Back body: same silhouette + spine line + no facial features (ears/nose implied by chin-up head)
+  const backBase=`
+    <ellipse cx="24" cy="6.5" rx="5" ry="5.5" fill="${B}" stroke="${O}" stroke-width=".9"/>
+    <rect x="21.5" y="11.5" width="5" height="3.5" rx="1" fill="${B}" stroke="${O}" stroke-width=".9"/>
+    <path d="M15,15 Q12,18 12,28 L12,42 Q12,44 14,44 L34,44 Q36,44 36,42 L36,28 Q36,18 33,15 Z" fill="${B}" stroke="${O}" stroke-width=".9"/>
+    <line x1="24" y1="15" x2="24" y2="44" stroke="${O}" stroke-width=".7" opacity=".55"/>
+    <path d="M15,16 Q10,19 9,27 Q8,33 9,36 Q11,38 13,36 Q14,33 14,28 L15,20 Z" fill="${B}" stroke="${O}" stroke-width=".9"/>
+    <path d="M33,16 Q38,19 39,27 Q40,33 39,36 Q37,38 35,36 Q34,33 34,28 L33,20 Z" fill="${B}" stroke="${O}" stroke-width=".9"/>
+    <path d="M15,44 Q13,49 13,56 Q13,62 15,63 Q18,65 19,62 Q20,57 20,53 L20,44 Z" fill="${B}" stroke="${O}" stroke-width=".9"/>
+    <path d="M33,44 Q35,49 35,56 Q35,62 33,63 Q30,65 29,62 Q28,57 28,53 L28,44 Z" fill="${B}" stroke="${O}" stroke-width=".9"/>
+    <path d="M14,63 Q13,67 14,70 Q15,72 17,71 Q18,69 18,66 L18,62 Z" fill="${B}" stroke="${O}" stroke-width=".9"/>
+    <path d="M34,63 Q35,67 34,70 Q33,72 31,71 Q30,69 30,66 L30,62 Z" fill="${B}" stroke="${O}" stroke-width=".9"/>`;
+
+  // highlights map
+  const HL={
+    quads:`
+      <path d="M15,44 Q13,49 13,56 Q13,62 15,63 Q18,65 19,62 Q20,57 20,53 L20,44 Z" fill="${H}" opacity=".82"/>
+      <path d="M33,44 Q35,49 35,56 Q35,62 33,63 Q30,65 29,62 Q28,57 28,53 L28,44 Z" fill="${H}" opacity=".82"/>`,
+    glutes:`
+      <path d="M15,39 Q13,43 13,49 Q13,55 16,57 Q19,59 20,55 L20,44 L15,39 Z" fill="${H}" opacity=".85"/>
+      <path d="M33,39 Q35,43 35,49 Q35,55 32,57 Q29,59 28,55 L28,44 L33,39 Z" fill="${H}" opacity=".85"/>
+      <path d="M16,38 Q14,43 20,44 L28,44 Q34,43 32,38 Q29,36 24,36 Q19,36 16,38 Z" fill="${H}" opacity=".72"/>`,
+    glutemed:`
+      <ellipse cx="12.5" cy="37" rx="4.5" ry="6" fill="${H}" opacity=".85"/>
+      <ellipse cx="35.5" cy="37" rx="4.5" ry="6" fill="${H}" opacity=".85"/>`,
+    hamstrings:`
+      <path d="M15,49 Q13,53 13,59 Q13,63 15,64 Q18,65 19,62 L19,51 Z" fill="${H}" opacity=".85"/>
+      <path d="M33,49 Q35,53 35,59 Q35,63 33,64 Q30,65 29,62 L29,51 Z" fill="${H}" opacity=".85"/>`,
+    core:`
+      <rect x="19" y="25" width="10" height="17" rx="2.5" fill="${H}" opacity=".78"/>
+      <line x1="24" y1="25" x2="24" y2="42" stroke="white" stroke-width=".9" opacity=".55"/>
+      <line x1="19" y1="29" x2="29" y2="29" stroke="white" stroke-width=".7" opacity=".45"/>
+      <line x1="19" y1="33" x2="29" y2="33" stroke="white" stroke-width=".7" opacity=".45"/>
+      <line x1="19" y1="37" x2="29" y2="37" stroke="white" stroke-width=".7" opacity=".45"/>`,
+    pelvicfloor:`
+      <ellipse cx="24" cy="45.5" rx="7" ry="3" fill="${H}" opacity=".85"/>`,
+    chest:`
+      <path d="M15,17 Q14,22 15,27 Q19,30 24,29 Q29,30 33,27 Q34,22 33,17 Q29,16 24,16 Q19,16 15,17 Z" fill="${H}" opacity=".8"/>
+      <line x1="24" y1="16" x2="24" y2="29" stroke="white" stroke-width=".9" opacity=".55"/>`,
+    shoulders:`
+      <ellipse cx="11.5" cy="19" rx="4.5" ry="5.5" fill="${H}" opacity=".85"/>
+      <ellipse cx="36.5" cy="19" rx="4.5" ry="5.5" fill="${H}" opacity=".85"/>`,
+    lats:`
+      <path d="M14,17 Q12,22 12,30 Q12,38 14,41 Q18,43 20,39 L20,26 Q18,20 14,17 Z" fill="${H}" opacity=".8"/>
+      <path d="M34,17 Q36,22 36,30 Q36,38 34,41 Q30,43 28,39 L28,26 Q30,20 34,17 Z" fill="${H}" opacity=".8"/>`,
+    traps:`
+      <path d="M16,16 Q14,18 14,24 Q18,27 24,26 Q30,27 34,24 Q34,18 32,16 Q28,15 24,15 Q20,15 16,16 Z" fill="${H}" opacity=".82"/>
+      <line x1="24" y1="15" x2="24" y2="26" stroke="white" stroke-width=".7" opacity=".4"/>`,
+    biceps:`
+      <path d="M10,19 Q8,25 9,30 Q11,33 13,30 Q14,27 13,22 Z" fill="${H}" opacity=".85"/>
+      <path d="M38,19 Q40,25 39,30 Q37,33 35,30 Q34,27 35,22 Z" fill="${H}" opacity=".85"/>`,
+    triceps:`
+      <path d="M9,21 Q8,28 9,32 Q11,35 13,32 Q14,29 14,24 Z" fill="${H}" opacity=".85"/>
+      <path d="M39,21 Q40,28 39,32 Q37,35 35,32 Q34,29 34,24 Z" fill="${H}" opacity=".85"/>`,
+    calves:`
+      <path d="M14,63 Q12,67 13,70 Q15,72 17,71 Q18,69 17,66 L16,63 Z" fill="${H}" opacity=".85"/>
+      <path d="M34,63 Q36,67 35,70 Q33,72 31,71 Q30,69 31,66 L32,63 Z" fill="${H}" opacity=".85"/>`,
+    hipflexors:`
+      <path d="M18,38 Q16,42 17,47 Q19,50 21,47 L21,42 Z" fill="${H}" opacity=".85"/>
+      <path d="M30,38 Q32,42 31,47 Q29,50 27,47 L27,42 Z" fill="${H}" opacity=".85"/>
+      <ellipse cx="24" cy="38" rx="5" ry="3" fill="${H}" opacity=".6"/>`,
+  };
+
+  const LBL='#9e948c'; // label text colour
+
+  // Build a side-by-side front+back SVG (96×84px total)
+  // The active view is highlighted; the inactive view is dimmed
+  // Small "FRONT" / "BACK" labels below each figure
+  function buildSVG(regions, view){
+    // Scale + translate: two 48×72 figures side by side with 8px gap, labels below
+    // Total: 104 × 84 (72 body + 12 label area)
+    let frontHi = view==='front' ? regions.map(r=>HL[r]||'').join('') : '';
+    let backHi  = view==='back'  ? regions.map(r=>HL[r]||'').join('') : '';
+    let frontDim = view==='back'  ? ' opacity=".28"' : '';
+    let backDim  = view==='front' ? ' opacity=".28"' : '';
+    return `<svg width="104" height="84" viewBox="0 0 104 84" xmlns="http://www.w3.org/2000/svg">
+      <!-- FRONT figure (left) -->
+      <g transform="translate(0,0)"${frontDim}>
+        ${frontBase}
+        ${frontHi}
+      </g>
+      <text x="24" y="82" text-anchor="middle" font-size="7" font-weight="700" fill="${LBL}" font-family="sans-serif" letter-spacing=".5">FRONT</text>
+      <!-- BACK figure (right) -->
+      <g transform="translate(56,0)"${backDim}>
+        ${backBase}
+        ${backHi}
+      </g>
+      <text x="80" y="82" text-anchor="middle" font-size="7" font-weight="700" fill="${LBL}" font-family="sans-serif" letter-spacing=".5">BACK</text>
+    </svg>`;
+  }
+
+  // Muscle string → {regions, view, preciseName}
+  const muscleMap={
+    'legs':               {r:['quads'],               v:'front', p:'Quadriceps'},
+    'quadriceps':         {r:['quads'],               v:'front', p:'Quadriceps'},
+    'glutes / hamstrings':{r:['glutes','hamstrings'], v:'back',  p:'Gluteus Maximus · Biceps Femoris'},
+    'glutes / thighs':    {r:['glutes','quads'],      v:'back',  p:'Gluteus Maximus · Quadriceps'},
+    'glutes':             {r:['glutes'],              v:'back',  p:'Gluteus Maximus'},
+    'glute medius':       {r:['glutemed'],            v:'back',  p:'Gluteus Medius'},
+    'glute med':          {r:['glutemed'],            v:'back',  p:'Gluteus Medius'},
+    'hamstrings':         {r:['hamstrings'],          v:'back',  p:'Biceps Femoris · Semitendinosus'},
+    'calves':             {r:['calves'],              v:'back',  p:'Gastrocnemius · Soleus'},
+    'balance':            {r:['quads','core'],        v:'front', p:'Quadriceps · Core Stability'},
+    'core':               {r:['core'],               v:'front', p:'Rectus Abdominis · Transversus Abdominis'},
+    'core / grip':        {r:['core'],               v:'front', p:'Transversus Abdominis · Forearms'},
+    'core / back':        {r:['core','lats'],        v:'back',  p:'Transversus Abdominis · Latissimus Dorsi'},
+    'pelvic floor':       {r:['core','pelvicfloor'], v:'front', p:'Pelvic Floor (Levator Ani)'},
+    'chest':              {r:['chest'],              v:'front', p:'Pectoralis Major'},
+    'back':               {r:['lats'],               v:'back',  p:'Latissimus Dorsi · Rhomboids'},
+    'upper back':         {r:['traps'],              v:'back',  p:'Trapezius · Rhomboids'},
+    'shoulders':          {r:['shoulders'],          v:'front', p:'Deltoids (Anterior · Lateral)'},
+    'arms':               {r:['biceps','triceps'],   v:'front', p:'Biceps Brachii · Triceps Brachii'},
+    'total body':         {r:['quads','core','chest','shoulders'],v:'front',p:'Full Kinetic Chain'},
+    'hip flexors':        {r:['hipflexors'],         v:'front', p:'Iliopsoas · Rectus Femoris'},
+    'spine / hips':       {r:['hipflexors','glutes'],v:'back',  p:'Hip Flexors · Glutes'},
+    'spine / core':       {r:['core','traps'],       v:'back',  p:'Spinal Extensors · Core'},
+    'spine / back':       {r:['lats','traps'],       v:'back',  p:'Latissimus Dorsi · Trapezius'},
+    'hip flexors / glutes':{r:['hipflexors','glutes'],v:'back', p:'Iliopsoas · Gluteus Maximus'},
+    'obliques / core':    {r:['core'],               v:'front', p:'External Obliques · Transversus Abdominis'},
+    'core / hip flexors': {r:['core','hipflexors'],  v:'front', p:'Transversus Abdominis · Iliopsoas'},
+    'core / obliques':    {r:['core'],               v:'front', p:'Transversus Abdominis · Obliques'},
+    'glutes / core':      {r:['glutes','core'],      v:'back',  p:'Gluteus Maximus · Transversus Abdominis'},
+    'quadratus lumborum / core':{r:['lats','core'],  v:'back',  p:'Quadratus Lumborum · Transversus Abdominis'},
+    'adductors / gluteus medius / obliques':{r:['glutemed','core'],v:'front',p:'Adductors · Gluteus Medius · Obliques'},
+    'glutes / hamstrings / triceps':{r:['glutes','hamstrings','triceps'],v:'back',p:'Gluteus Maximus · Biceps Femoris · Triceps Brachii'},
+    'gluteus maximus / triceps / erector spinae':{r:['glutes','triceps','traps'],v:'back',p:'Gluteus Maximus · Triceps Brachii · Erector Spinae'},
+    'gluteus maximus / hip flexors / core':{r:['glutes','hipflexors','core'],v:'back',p:'Gluteus Maximus · Iliopsoas · Transversus Abdominis'},
+    'quadriceps / glutes':{r:['quads','glutes'],     v:'front', p:'Quadriceps · Gluteus Maximus'},
+    'gluteus maximus':    {r:['glutes'],             v:'back',  p:'Gluteus Maximus'},
+  };
+
+  window.getMuscleData=function(m){
+    if(!m)return{svg:'',precise:''};
+    let key=m.toLowerCase();
+    let entry=muscleMap[key];
+    if(!entry){
+      let k=Object.keys(muscleMap).find(k=>key.includes(k)||k.includes(key));
+      entry=k?muscleMap[k]:{r:['core'],v:'front',p:m};
+    }
+    return{svg:buildSVG(entry.r,entry.v),precise:entry.p};
+  };
+})();
+
+const workouts={
+  glute:{title:'Glute Power — Lower Body',goal:'Lower body strength + core',circuits:[
+    ['Squat + Hinge',[
+      ex('goblet','Goblet Squat',[5,7,9,11],'kg total','Legs','Hold one dumbbell vertically at your chest. Squat down between your legs, then exhale as you drive back up to standing.','squat','10–12 kg',{shortCue:'Squat down, exhale to stand.'}),
+      ex('sumo','Sumo Squat',[5,7,9,11],'kg total','Glutes / thighs','Take a wide stance with toes turned out. Squat down, keeping your knees tracking over your toes.','sumo','10–12 kg',{shortCue:'Wide stance, knees over toes.'}),
+      ex('hip','Hip Thrust',[8,12,16,20],'kg total','Glutes','Upper back rested on a bench, dumbbell across your hips. Drive your hips up to full extension and pause at the top.','hip','20 kg total',{shortCue:'Drive hips up, pause at top.'}),
+      ex('bridgemarch','Glute Bridge March',[0,0,2,4],'kg','Glutes / Pelvic floor','Hold a glute bridge position, then march one heel at a time toward the floor, keeping your hips level throughout.','bridgemarch','with DB + band',{shortCue:'Hold the bridge, march one heel down.'})
+    ]],
+    ['Lunge + Burn',[
+      ex('reverse','Reverse Lunge',[3,5,6,8],'kg each','Legs','Take a long step backward. Bend both knees to about ninety degrees, then exhale as you drive back up to standing.','lunge','8 kg each',{shortCue:'Step back, both knees to ninety, drive up.'}),
+      ex('rdl','Romanian Deadlift',[4,6,8,10],'kg each','Glutes / hamstrings','Hinge at your hips with the dumbbells sliding along your shins, keeping your back flat. Drive your hips forward to stand tall.','rdl','10–12 kg each',{shortCue:'Hinge back, flat back, stand tall.'}),
+      ex('curtsy','Curtsy Lunge',[2,3,4,5],'kg each','Glutes','Step one leg diagonally behind and across the other, bending both knees, then push back up to standing.','curtsy','5 kg each',{knee:true,shortCue:'Step back and across, bend both knees.'}),
+      ex('bridge','Banded Bridge Pulse',[0,0,0,0],'band','Glutes','Glute bridge with a band above your knees. Pulse your hips up and down in a small range at the top, while your legs press out against the band.','bandedbridge','stronger band',{shortCue:'Small pulses at the top, press out.'})
+    ]],
+    ['Strong Finisher',[
+      ex('single','Single-Leg RDL',[3,4,5,6],'kg one DB','Balance','Balance on one leg. Hinge forward with a flat back while your opposite leg extends behind you for counterbalance.','singlerdl','6 kg',{knee:true,shortCue:'Hinge forward on one leg.'}),
+      ex('bulgarian','Bulgarian Split Squat',[0,2,4,6],'kg each','Quadriceps / Glutes','Rear foot elevated on a bench or step. Lower down until your front thigh is near parallel, then drive back up.','bulgarian','slow controlled depth',{knee:true,shortCue:'Lower down, drive back up.'}),
+      ex('g_stepup','Reverse Lunge to Knee Drive',[0,2,4,6],'kg each','Quadriceps / Glutes / Hip flexors','Step back into a reverse lunge, then drive off your front leg and bring your rear knee up to hip height in one motion. Pause briefly for balance.','lungeknee','pause at the top',{knee:true,shortCue:'Lunge back, drive the knee up.'}),
+      ex('band','Banded Lateral Walk',[0,0,0,0],'band','Glute medius','Band above your knees. Step slowly to the side, keeping constant tension on the band throughout.','band','stronger band',{shortCue:'Side-step slowly, keep tension on.'})
+    ]]
+  ]},
+  posture:{title:'Core & Upper — Upper + Core',goal:'Upper body strength + resilient core',circuits:[
+    ['Core + Pull',[
+      ex('floor','Floor Press',[3,4,5,6],'kg each','Chest','Lying on the floor, press dumbbells straight up from bent elbows until arms are extended, then lower with control.','floor','6–8 kg each',{shortCue:'Press up, control the lower.'}),
+      ex('row','Bent-Over Row',[3,5,6,7],'kg each','Back','Hinge forward with a flat back, dumbbells hanging down. Row both weights up toward your back pockets, squeezing the shoulder blades together, then lower with control.','row','7–8 kg each',{shortCue:'Row to the pockets, squeeze.'}),
+      ex('deadbug','Weighted Dead Bug',[1,2,3,4],'kg held','Core','Lie on your back holding a light weight overhead, knees bent at 90°. Lower one arm and the opposite leg toward the floor together, keeping your low back pressed flat, then return and switch sides.','deadbug','4 kg',{shortCue:'Lower opposite arm and leg, back flat.'}),
+      ex('p_birdext','Bird Dog Extension',[0,0,0,0],'bodyweight','Core / Glutes','On all fours, extend opposite arm and leg simultaneously. Hold 2s. Keep hips square — no rotation. Exhale to extend. This is the therapeutic foundation before the weighted row version.','birdext','hold each side',{shortCue:'Extend arm and leg, hips square.'})
+    ]],
+    ['Push + Posture',[
+      ex('shoulder','Shoulder Press',[2,3,4,5],'kg each','Shoulders','Press a dumbbell in each hand straight overhead until your arms are extended, keeping your ribs down so your back doesn\'t arch, then lower with control.','press','5–6 kg each',{shortCue:'Press overhead, ribs down.'}),
+      ex('curl','Bicep Curl',[2,3,4,5],'kg each','Arms','Stand tall holding a dumbbell in each hand. Curl the weights up toward your shoulders, keeping your elbows pinned at your sides, then lower slowly without swinging.','row','5 kg each',{shortCue:'Curl up, no swinging.'}),
+      ex('trikick','Tricep Kickback',[1,2,3,4],'kg each','Triceps','Hinge forward from hips, back flat, core braced. Elbow stays high and still — only the forearm moves. Extend straight back, squeeze, control the return. Exhale on the extension.','trikick','4 kg each',{shortCue:'Extend back, squeeze, control the return.'}),
+      ex('sideplank','Side Plank',[0,0,0,0],'bodyweight','Obliques / Gluteus medius','Modified (bent knee) first. Lift hips, straight line shoulder to knee. Hold 15–20s each side. Progress to full side plank at Phase 3. Monitor lateral knee.','sideplank','full 35s hold',{knee:true,shortCue:'Lift hips, straight line.'})
+    ]],
+    ['Stability',[
+      ex('inclinepush','Incline Push-Up',[0,0,0,0],'bodyweight','Chest / Triceps','Hands on a raised, sturdy surface (counter, stairs, bench) — hips, ribs and shoulders in one line, no doming or coning. Lower chest toward hands, push back up. Exhale on the push. Lower the incline height as you get stronger.','inclinepush','flat push-up',{dr:true,shortCue:'Lower chest, push back up.'}),
+      ex('raise','Lateral Raise',[1,2,3,4],'kg each','Shoulders','Stand tall holding a dumbbell in each hand at your sides. Raise both arms out to shoulder height, leading with your elbows, then lower slowly with control.','raise','4 kg each',{shortCue:'Raise to shoulder height, lower slowly.'}),
+      ex('pullapart','Band Pull-Apart',[0,0,0,0],'band','Upper back','Hold a resistance band with both hands at chest height, arms extended. Pull the band apart, squeezing your shoulder blades together, then return with control.','pullapart','stronger band',{shortCue:'Pull apart, squeeze shoulder blades.'}),
+      ex('bearpickup','Bear Hold Pick Up',[1,2,3,4],'kg one hand','Core / Obliques','From bear hold, one hand picks up a dumbbell from the floor and places it down. Challenge is keeping hips level with one hand removed. Slow and controlled — resist the tilt.','bearpickup','slow transfer',{shortCue:'Pick up, hips stay level.'})
+    ]]
+  ]},
+  athlete:{title:'Mum Athlete — Total Body',goal:'Strength, conditioning + carrying power',circuits:[
+    ['Total Strength',[
+      ex('a_squat','Goblet Squat',[5,7,9,11],'kg total','Legs','Hold one dumbbell vertically at your chest. Squat down between your legs, then exhale as you drive back up to standing.','squat','10–12 kg',{shortCue:'Squat down, exhale to stand.'}),
+      ex('a_sumo','Sumo Squat',[5,7,9,11],'kg total','Glutes','Take a wide stance with toes turned out. Squat down, keeping your knees tracking over your toes.','sumo','10–12 kg',{shortCue:'Wide stance, knees over toes.'}),
+      ex('a_hip','Hip Thrust',[8,12,16,20],'kg total','Glutes','Upper back rested on a bench, dumbbell across your hips. Drive your hips up to full extension and pause at the top.','hip','20 kg',{shortCue:'Drive hips up, pause at top.'}),
+      ex('a_row','Bent-Over Row',[3,5,6,7],'kg each','Back','Hinge forward with a flat back, dumbbells hanging down. Row both weights up toward your back pockets, squeezing the shoulder blades together, then lower with control.','row','7–8 kg each',{shortCue:'Row to the pockets, squeeze.'})
+    ]],
+    ['Strength Combo',[
+      ex('lungepress','Reverse Lunge to Press',[2,3,4,5],'kg each','Total body','Exhale on stand + press. Break into two separate exhales if needed — one to stand, one to press.','lunge','5 kg each',{dr:true,shortCue:'Stand and press together.'}),
+      ex('a_rdl','Romanian Deadlift',[4,6,8,10],'kg each','Hamstrings','Hinge at your hips with the dumbbells sliding along your shins, keeping your back flat. Drive your hips forward to stand tall.','rdl','10 kg each',{shortCue:'Hinge back, flat back, stand tall.'}),
+      ex('a_woodchop','Dumbbell Wood Chop',[2,3,4,5],'kg two hands','Obliques / Core','Hold dumbbell with both hands. Rotate diagonally — high to low across the body. Control the return. Exhale on the chop. Functional anti-rotation that mimics baby-carrying movements.','woodchop','control return',{shortCue:'Chop high to low, control the return.'}),
+      ex('c_suitcase','Suitcase Carry',[4,6,8,10],'kg one hand','Quadratus lumborum / Core','Walk holding one dumbbell at your side. Resist the urge to lean toward the weight, keeping your core braced.','suitcase','resist the lean',{shortCue:'Walk tall, resist the lean.'})
+    ]],
+    ['Athletic Core',[
+      ex('a_beartwist','Bear Twist',[0,1,2,3],'kg optional','Obliques / Core','From bear hold, rotate torso — one shoulder toward floor, opposite opens up. Hips stay level. Hold 3s. Regression: look over shoulder only (thoracic only). Phase 4: light dumbbell in extending arm.','beartwist','hips level',{shortCue:'Rotate, hips stay level.'}),
+      ex('a_copenhagen','Copenhagen Plank',[0,0,0,0],'bodyweight','Adductors / Gluteus medius / Obliques','Side-lying, top foot on sofa/step. Bent knee (Phase 2): bottom knee down. Straight leg (Phase 3): both legs long. Hold 20–30s each side. Monitor lateral knee.','copenhagen','bent knee first',{knee:true,shortCue:'Lift hips, hold steady.'}),
+      ex('a_deadbug','Weighted Dead Bug',[1,2,3,4],'kg held','Core','Lie on your back holding a light weight overhead, knees bent at 90°. Lower one arm and the opposite leg toward the floor together, keeping your low back pressed flat, then return and switch sides.','deadbug','4 kg',{shortCue:'Lower opposite arm and leg, back flat.'}),
+      ex('a_carry','Farmer Carry',[4,6,8,10],'kg each','Core / grip','Walk holding a dumbbell in each hand at your sides. Keep your posture tall and core braced — this one also challenges your grip.','carry','10 kg each',{shortCue:'Walk tall, brace your core.'})
+    ]]
+  ]},
+  build:{title:'Build — Bear Family + Reverse Plank',goal:'Core strength · anti-rotation · posterior chain',circuits:[
+    ['Bear Hold Foundation',[
+      ex('bearhold','Bear Hold (Static)',[0,0,0,0],'bodyweight','Core','Knees hover 2–3cm off floor, wrists under shoulders, spine neutral. Breathe steadily. Warm wrists first — slow circles. Hold 20–30s. This is the foundation for every bear variation.','bearhold','20–30s hold',{shortCue:'Knees hover, breathe steady.'}),
+      ex('bearkneehigh','Bear Knee March',[0,0,0,0],'bodyweight','Core / Hip flexors','From bear hold, drive alternate knees toward chest. Keep hips level. Exhale with each drive. Pelvic floor lifts gently on each knee drive. Low impact, high postnatal value.','bearkneehigh','hips level',{shortCue:'Drive knee to chest, hips level.'}),
+      ex('birdext','Bird Dog Extension',[0,0,0,0],'bodyweight','Core / Glutes','Extend opposite arm + leg simultaneously. Hold 2s. No rotation in the hips. Exhale to extend. This is the bodyweight foundation before the Bird Dog Row.','birdext','hold 2s',{shortCue:'Extend arm and leg, hips square.'}),
+      ex('heeldrop2','Supine Heel Drops',[0,0,0,0],'bodyweight','Core / Pelvic floor','On back, knees bent. Slowly lower one heel to floor — low back stays completely flat. Alternate. Long exhale as heel lowers. Best postnatal dead bug regression.','heeldrop','back stays flat',{shortCue:'Lower one heel, back stays flat.'}),
+    ]],
+    ['Bear Progressions',[
+      ex('bearkнеedrive2','Bear Knee Drive',[0,0,0,0],'bodyweight','Obliques / Core','From bear hold, knee to same-side elbow. Progress to cross-body: knee to opposite elbow. Exhale on every drive. Adds rotational demand to the bear family.','bearhold','exhale each rep',{shortCue:'Knee to elbow, exhale each rep.'}),
+      ex('bearleg2','Bear Leg Extension',[0,0,0,0],'bodyweight','Glutes / Core','Extend one leg to hip height, hold 2s, return. Keep spine neutral. Exhale to extend. At Phase 3 add ankle weight or loop band above knees.','bearleg','2s hold',{shortCue:'Extend leg back, hold briefly.'}),
+      ex('bearpickup2','Bear Hold Pick Up',[1,2,3,4],'kg one hand','Core / Obliques','From bear hold, pick up a dumbbell and place it back. Hips must stay level — resist the tilt. Slow transfer. The hardest anti-rotation challenge in the bear family.','bearpickup','resist the tilt',{shortCue:'Pick up, hips stay level.'}),
+      ex('glkickback2','Glute Kickback',[0,0,0,0],'bodyweight','Gluteus maximus','On all fours, kick leg straight back to hip height. Squeeze glute at top. Hips square. Exhale on the kick. Phase 2: add loop band above knees.','kickback','squeeze at top',{shortCue:'Kick back, squeeze at the top.'}),
+    ]],
+    ['Bear Twist + Advanced',[
+      ex('beartwist2','Bear Twist',[0,1,2,3],'kg optional','Obliques / Core','From bear hold, rotate torso — one shoulder toward floor, opposite opens up. Hips stay level. Hold 3s. Regression: look over shoulder only (thoracic only). Phase 4: light dumbbell in extending arm.','beartwist','hips level',{shortCue:'Rotate, hips stay level.'}),
+      ex('woodchop2','Dumbbell Wood Chop',[2,3,4,5],'kg two hands','Obliques / Core','Hold dumbbell with both hands. Rotate diagonally — high to low across the body. Control the return. Exhale on the chop. Functional anti-rotation that mimics baby-carrying movements.','woodchop','control return',{shortCue:'Chop high to low, control the return.'}),
+      ex('stepup2','Reverse Lunge to Knee Drive',[0,2,4,6],'kg each','Quadriceps / Glutes / Hip flexors','Step back into a reverse lunge, then drive off the front leg and bring the rear knee up to hip height in one motion. Pause briefly for balance, then step back into the next rep. Exhale on the drive. No equipment or elevated surface needed.','lungeknee','pause at the top',{knee:true,shortCue:'Lunge back, drive the knee up.'}),
+      ex('suitcase2','Suitcase Carry',[4,6,8,10],'kg one hand','Quadratus lumborum / Core','Walk with one dumbbell at side. Resist leaning. Shoulders square. Switch sides. Your 10kg dumbbell is ideal for Phase 4. Baby-carrying strength.','suitcase','resist the lean',{shortCue:'Walk tall, resist the lean.'}),
+    ]],
+    ['Reverse Plank Family',[
+      ex('revplankbent2','Reverse Plank (Bent Knee)',[0,0,0,0],'bodyweight','Glutes / Hamstrings / Triceps','Hands behind, feet flat, lift hips to tabletop. Hold 15–20s. Warm wrists first. If wrists uncomfortable: use fists or substitute hip thrust hold. Posterior chain activation.','revplankbent','warm wrists first',{wrist:true,shortCue:'Lift hips to tabletop.'}),
+      ex('revplank2','Reverse Plank (Straight Leg)',[0,0,0,0],'bodyweight','Gluteus maximus / Triceps / Erector spinae','Extend legs fully. Full posterior chain. Hold 20–30s. Higher wrist load — listen to your wrists. Phase 3+.','revplank','hold 20–30s',{wrist:true,shortCue:'Hold the line, breathe steady.'}),
+      ex('revplankkнее2','Reverse Plank Knee Drive',[0,0,0,0],'bodyweight','Gluteus maximus / Hip flexors / Core','From straight-leg reverse plank, drive one knee to chest. Do not let hips drop more than 2cm. Alternate sides. Phase 3–4.','revplank','hips stay up',{wrist:true,shortCue:'Drive knee in, hips stay up.'}),
+      ex('copenhagen2','Copenhagen Plank',[0,0,0,0],'bodyweight','Adductors / Gluteus medius / Obliques','Side-lying, top foot on sofa/step. Bent knee (Phase 2): bottom knee down. Straight leg (Phase 3): both legs long. Hold 20–30s each side. Monitor lateral knee.','copenhagen','bent knee first',{knee:true,shortCue:'Lift hips, hold steady.'}),
+    ]],
+  ]}
+};
+
+// ── NEW EXERCISES: Bear Family, Reverse Plank, Wood Chop, etc. ──
+// ── WARM-UP SEQUENCE — v11: supine heel drops replaces glute bridge march ──
+const warmupExercises=[
+  {id:'wu1',name:'Diaphragmatic Breathing',time:30,muscle:'Pelvic floor',
+   cue:'Lie on back, knees bent. Inhale — belly rises, pelvic floor softens and drops. Exhale — belly falls, pelvic floor gently lifts. This is your foundation for everything today.',
+   shortCue:'Inhale, belly rises. Exhale, belly falls.',
+   video:'https://www.youtube.com/shorts/qi2y-eI_kuI'},
+  {id:'wu2',name:'Supine Heel Drops',time:30,muscle:'Core / Pelvic floor',
+   cue:'Lie on back, knees bent, low back flat. Slowly lower one heel toward floor — keep back completely flat. Lift back. Alternate. Long exhale as heel lowers. Best postnatal core starter — teaches the exhale-brace pattern you need for every exercise today.',
+   shortCue:'Lower one heel, back stays flat.',
+   video:'https://www.youtube.com/shorts/WBqZcsAMIE4'},
+  {id:'wu3',name:'Cat-Cow',time:30,muscle:'Spine / Core',
+   cue:'On all fours. Inhale — drop belly, lift chest and tailbone (cow). Exhale — round spine to ceiling, tuck chin and pelvis (cat). Move slowly and find your breath.',
+   shortCue:'Inhale drop belly, exhale round spine.',
+   video:'https://www.youtube.com/shorts/kqnua4rHVVA'},
+  {id:'wu4',name:'Hip Circles',time:30,muscle:'Hip flexors / Glutes',
+   cue:'Stand feet hip-width. Hands on hips. Draw slow large circles with your pelvis — loosen the joints, warm the glutes. Reverse direction halfway.',
+   shortCue:'Slow circles, loosen the hips.',
+   video:'https://www.youtube.com/shorts/eP-R3oBFiJ4'},
+  {id:'wu5',name:'Arm Circles + Shoulder Rolls',time:30,muscle:'Shoulders / Upper back',
+   cue:'Stand tall. 10 forward arm circles, 10 backward. Then roll shoulders up, back, and down slowly. Counters the rounded posture from feeding. Chest open, chin tucked.',
+   shortCue:'Circle arms, roll shoulders back.',
+   video:'https://www.youtube.com/shorts/MxQlSph7Zug'},
+];
+
+// ── COOL-DOWN SEQUENCE (4 moves · 40s each · no rest · ~3 min) ──
+const cooldownExercises=[
+  {id:'cd1',name:'Child\'s Pose',time:40,muscle:'Spine / Hips',
+   cue:'Kneel and sit hips toward heels, arms stretched forward or by sides. Let your spine decompress. Breathe into your lower back. Stay soft and heavy.',
+   shortCue:'Sit back, breathe into your back.',
+   video:'https://www.youtube.com/shorts/VH-Ws3K-x7k'}, // SarahBethYoga, 0:31 — "Are you doing child's pose correctly?"
+  {id:'cd2',name:'Hip Flexor Stretch',time:40,muscle:'Hip flexors',
+   cue:'Half-kneeling — one knee down, other foot forward. Gently shift weight forward until you feel a stretch at the front of the back hip. Keep pelvis tucked, spine tall. 20s each side.',
+   shortCue:'Shift forward, feel the stretch.',
+   video:'https://www.youtube.com/shorts/bDnKvilZ4G0'}, // Feel Good Life w/ Coach Todd, 0:17 — exact title match, was wrongly showing a Lateral Band Walk video
+  {id:'cd3',name:'Chest Opener',time:40,muscle:'Chest / Shoulders',
+   cue:'Stand or sit tall. Clasp hands behind your back, gently squeeze shoulder blades together, and open your chest toward the ceiling. Hold and breathe. Counters feeding posture beautifully.',
+   shortCue:'Squeeze shoulder blades, open the chest.',
+   video:'https://www.youtube.com/shorts/crnw1IKWNZY'}, // St. Peter's Health, 0:24 — "Standing Chest Opener", description matches our cue almost word for word
+  {id:'cd4',name:'Supine Pelvic Floor Breathing',time:40,muscle:'Pelvic floor',
+   cue:'Lie on back, knees bent, one hand on belly. Inhale fully — feel belly rise and pelvic floor soften. Long exhale — gentle lift of pelvic floor. 5 slow breaths. Let your nervous system settle.',
+   shortCue:'Inhale to soften, exhale a gentle lift.',
+   video:'https://www.youtube.com/shorts/eFkqvl8Q574'}, // Cornerstone Physiotherapy, 0:44 — postpartum pelvic health physio, exact topic match
+];
+
+function warmupFlat(){return warmupExercises.map((e,i)=>({ex:e,idx:i}))}
+function cooldownFlat(){return cooldownExercises.map((e,i)=>({ex:e,idx:i}))}
+function segmentFlat(){
+  let seg=state.guided.segment;
+  if(seg==='warmup')return warmupFlat();
+  if(seg==='cooldown')return cooldownFlat();
+  return flat();
+}
+function segmentExTime(){
+  let seg=state.guided.segment;
+  if(seg==='warmup')return 30;
+  if(seg==='cooldown')return 40;
+  return workTime();
+}
+function segmentLabel(){
+  if(state.guided.segment==='warmup')return'Warm-up';
+  if(state.guided.segment==='cooldown')return'Cool-down';
+  return workoutName(state.tab);
+}
+function firstSegment(){
+  if(state.warmupEnabled)return'warmup';
+  return'main';
+}
+function nextSegmentAfterMain(){
+  if(state.cooldownEnabled)return'cooldown';
+  return null; // no cooldown → straight to finishWorkout
+}
+
+// ── STATE ──
+let state=JSON.parse(localStorage.getItem('mamaMovesV12')||'{}');
+state.phase=state.phase||1;
+state.mode=state.mode||'standard';
+state.energy=state.energy||'yellow';
+state.tab=state.tab||'glute';
+state.done=state.done||{};
+state.guided=state.guided||{idx:0,round:1,time:40,work:true,segment:'main'};
+state.guided.segment=state.guided.segment||'main';
+state.warmupEnabled=state.warmupEnabled!==false;   // default on
+state.cooldownEnabled=state.cooldownEnabled!==false; // default on
+state.completed=state.completed||{};
+state.phaseSessions=state.phaseSessions||{1:0,2:0,3:0,4:0};
+state.unlockDismissed=state.unlockDismissed||{};
+state.backupReminderDismissed=state.backupReminderDismissed||false;
+let quietMode=state.quietMode===true;
+let audioCtx=null,int=null,isGuidedRunning=false,isCountingDown=false;
+
+// ── WAKE LOCK ──
+let wakeLock=null,wakeEnabled=state.wakeEnabled===true;
+async function requestWakeLock(){
+  if(!('wakeLock' in navigator))return;
+  try{
+    wakeLock=await navigator.wakeLock.request('screen');
+    wakeLock.addEventListener('release',()=>{wakeLock=null;updateWakeDot()});
+    updateWakeDot();
+  }catch(e){wakeLock=null;updateWakeDot()}
+}
+function releaseWakeLock(){if(wakeLock){wakeLock.release();wakeLock=null}updateWakeDot()}
+function updateWakeDot(){
+  let btn=document.getElementById('wakeBtn');
+  if(!btn)return;
+  btn.classList.toggle('active',wakeEnabled);
+  btn.textContent=wakeEnabled?'👁':'😴';
+  btn.title=wakeEnabled?'Screen stays awake — tap to allow sleep':'Screen can sleep — tap to keep awake during workout';
+}
+function toggleWakeLock(){
+  wakeEnabled=!wakeEnabled;state.wakeEnabled=wakeEnabled;save();
+  if(wakeEnabled&&isGuidedRunning)requestWakeLock();else releaseWakeLock();
+  updateWakeDot();
+}
+// Re-acquire if page becomes visible again (iOS releases on backgrounding)
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'&&wakeEnabled&&isGuidedRunning)requestWakeLock();
+});
+
+// ── HAPTICS ──
+function haptic(pattern){
+  if(!navigator.vibrate)return;
+  try{navigator.vibrate(pattern)}catch(e){}
+}
+// work start: two short punchy pulses
+function hapticWork(){haptic([60,40,60])}
+// rest start: one long gentle pulse
+function hapticRest(){haptic([180])}
+// countdown final 3s: short tick each second
+function hapticTick(){haptic([25])}
+
+function save(){localStorage.setItem('mamaMovesV12',JSON.stringify(state))}
+function allowedModes(){return state.phase===1?['express','standard']:['express','standard','complete']}
+function currentMode(){if(!allowedModes().includes(state.mode))state.mode='standard';return modes[state.mode]}
+function tempoConfig(){
+  if(state.energy==='green')return{work:35,rest:25,label:'🟢 Gentle',desc:'35s / 25s'};
+  return                           {work:40,rest:20,label:'🟡 Strong',desc:'40s / 20s'};
+}
+const ROUND_REST=90; // dedicated rest between rounds (distinct from tempo-based exercise rest)
+function currentRestTime(){return state.guided.roundBreak?ROUND_REST:restTime()}
+
+// TEST FEATURE: inline auto-playing video, scoped to one circuit only (Workout A / glute, Circuit 1)
+const INLINE_VIDEO_TEST_TAB='glute';
+const INLINE_VIDEO_TEST_CIRCUIT=0; // zero-indexed: circuit 1
+function ytEmbedUrl(url){
+  if(!url)return '';
+  let m=url.match(/shorts\/([a-zA-Z0-9_-]+)/)||url.match(/embed\/([a-zA-Z0-9_-]+)/)||url.match(/[?&]v=([a-zA-Z0-9_-]+)/)||url.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
+  if(!m)return '';
+  let id=m[1];
+  return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}&controls=0&rel=0&playsinline=1&modestbranding=1`;
+}
+function workTime(){return tempoConfig().work}
+function restTime(){return tempoConfig().rest}
+function selectedCircuits(tab=state.tab){
+  // Build tab shows all circuits regardless of mode — it's a progression library
+  if(tab==='build')return workouts[tab].circuits;
+  return workouts[tab].circuits.slice(0,currentMode().circuits);
+}
+function rounds(){return currentMode().rounds}
+function flat(tab=state.tab){let a=[];selectedCircuits(tab).forEach((c,ci)=>c[1].forEach((e,ei)=>a.push({ex:e,ci,ei,cname:c[0]})));return a}
+function weight(e){if(e.unit==='band'||e.unit==='bodyweight')return e.unit;let w=e.weights[state.phase-1];if(state.energy==='green')w=Math.max(1,w-1);return w+' '+e.unit}
+function workoutName(tab){
+  if(tab==='glute')return'Glute Power';
+  if(tab==='posture')return'Core & Upper';
+  if(tab==='athlete')return'Mum Athlete';
+  return'Build';
+}
+
+// ── AUDIO ──
+function initAudio(){try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume()}catch(e){}}
+function beep(f=760,d=110){
+  if(quietMode)return;initAudio();if(!audioCtx)return;
+  let o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.frequency.value=f;
+  g.gain.setValueAtTime(.001,audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(.25,audioCtx.currentTime+.02);
+  g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+d/1000);
+  o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+d/1000+.03);
+}
+function speak(t){if(quietMode||!('speechSynthesis'in window))return;try{speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(t))}catch(e){}}
+function cue(x){
+  if(x==='work'){beep(900);speak('Work');hapticWork()}
+  if(x==='rest'){beep(520);speak('Rest');hapticRest()}
+  if(x==='20'){beep(760);speak('20 seconds')}
+  if(x==='10'){beep(760);speak('10 seconds')}
+  if(x==='5'){beep(760);speak('5 seconds')}
+  if(x==='tick'){hapticTick()}
+}
+// Cue speech: full description previewed once at rest, short version repeated during work.
+// Applies across all workouts. Exercises without a shortCue authored yet will speak the
+// full long cue for all repeats (still functional, just less punchy) — see shortCue TODOs.
+function inCueSpeechScope(entry){return !!(entry&&entry.ex)}
+function speakRestPreview(entry,delay=900){
+  if(!inCueSpeechScope(entry)||!entry.ex.cue)return;
+  setTimeout(()=>speak(entry.ex.cue),delay);
+}
+function speakWorkCue(entry,delay=900){
+  if(!inCueSpeechScope(entry))return;
+  let text=entry.ex.shortCue||entry.ex.cue;
+  if(!text)return;
+  setTimeout(()=>speak(text),delay);
+}
+// Halfway repeat point during the work interval, ducked away from the 20/10/5s countdown beeps.
+function halfwayTriggerT(exTime){
+  let t=Math.floor(exTime/2);
+  for(const marker of [20,10,5]){ if(Math.abs(t-marker)<=2){ t=Math.max(marker-3,1); break } }
+  return t;
+}
+
+// ── RENDER ──
+// ── PHASE UNLOCK ──
+const SESSIONS_TO_UNLOCK=12;
+
+function renderSessionProgress(){
+  let card=document.querySelector('.session-card');
+  if(!card)return;
+  let p=state.phase;
+  let sessions=Math.min(state.phaseSessions[p]||0,SESSIONS_TO_UNLOCK);
+  let isMaxPhase=p>=4;
+  let pct=Math.round((sessions/SESSIONS_TO_UNLOCK)*100);
+
+  document.getElementById('sessionLabel').textContent=`Phase ${p} progress`;
+  document.getElementById('sessionFill').style.width=pct+'%';
+
+  if(isMaxPhase){
+    document.getElementById('sessionCount').textContent=`${state.phaseSessions[p]||0} sessions`;
+    document.getElementById('sessionNote').textContent="You're in the top phase — keep building strength 💪";
+    card.classList.add('maxed');
+  } else {
+    let remaining=Math.max(0,SESSIONS_TO_UNLOCK-(state.phaseSessions[p]||0));
+    document.getElementById('sessionCount').textContent=`${sessions} / ${SESSIONS_TO_UNLOCK} sessions`;
+    document.getElementById('sessionNote').textContent=remaining>0
+      ?`${remaining} more session${remaining===1?'':'s'} to unlock Phase ${p+1}`
+      :`Ready to unlock Phase ${p+1} 🎉`;
+    card.classList.remove('maxed');
+  }
+}
+
+function checkPhaseUnlock(){
+  renderSessionProgress();
+  let sec=document.getElementById('unlockSection');
+  if(!sec)return;
+  let p=state.phase;
+  let sessions=state.phaseSessions[p]||0;
+  let nextPhase=p+1;
+  let eligible=nextPhase<=4&&sessions>=SESSIONS_TO_UNLOCK&&!state.unlockDismissed[p];
+  if(eligible){
+    document.getElementById('unlockTitle').textContent=`Ready for Phase ${nextPhase}?`;
+    document.getElementById('unlockSub').textContent=`You've completed ${sessions} sessions in Phase ${p} — ${phaseInfo[nextPhase].name} awaits`;
+    sec.style.display='block';
+  } else {
+    sec.style.display='none';
+  }
+}
+function confirmPhaseUnlock(){
+  let p=state.phase;
+  setPhase(p+1);
+  state.unlockDismissed[p]=false; // reset so it can re-trigger if they go back later
+  save();render();
+}
+function dismissPhaseUnlock(){
+  state.unlockDismissed[state.phase]=true;
+  save();
+  document.getElementById('unlockSection').style.display='none';
+}
+
+const SESSIONS_BEFORE_BACKUP_NUDGE=10;
+function checkBackupReminder(){
+  let sec=document.getElementById('backupReminderSection');
+  if(!sec)return;
+  let totalSessions=Object.values(state.phaseSessions).reduce((a,b)=>a+b,0);
+  let eligible=totalSessions>=SESSIONS_BEFORE_BACKUP_NUDGE&&!state.backupReminderDismissed;
+  sec.style.display=eligible?'block':'none';
+}
+function dismissBackupReminder(){
+  state.backupReminderDismissed=true;
+  save();
+  document.getElementById('backupReminderSection').style.display='none';
+}
+
+function render(){
+  document.body.className='phase-'+state.phase;
+  let p=phaseInfo[state.phase],m=currentMode(),t=tempoConfig();
+  document.getElementById('ribbon').textContent=`${p.emoji} ${p.name} · ${p.focus}`;
+  document.getElementById('mumLevel').textContent=`${p.emoji} ${p.name}`;
+  document.getElementById('levelNote').textContent=p.focus;
+  document.getElementById('modeName').textContent=m.label;
+  document.getElementById('modeNote').textContent=m.time;
+  document.getElementById('nextWorkout').textContent=workoutName(state.tab).split(' ')[0];
+  document.getElementById('todayMini').textContent=workoutName(state.tab);
+  document.getElementById('missionName').textContent=workoutName(state.tab);
+  document.getElementById('missionTime').textContent=m.time;
+  document.getElementById('missionStructure').textContent=m.structure;
+  document.getElementById('missionGoal').textContent=workouts[state.tab].goal;
+  document.getElementById('controlNote').textContent=`${p.note} ${m.label}: ${m.structure} · ${t.label}: ${t.desc}.`;
+  document.querySelectorAll('[data-phase]').forEach(b=>b.classList.toggle('active',+b.dataset.phase===state.phase));
+  document.querySelectorAll('[data-mode]').forEach(b=>{
+    b.classList.toggle('active',b.dataset.mode===state.mode);
+    b.classList.toggle('disabled',!allowedModes().includes(b.dataset.mode));
+  });
+  document.querySelectorAll('[data-energy]').forEach(b=>b.classList.toggle('active',b.dataset.energy===state.energy));
+  renderGuided();renderWorkouts();renderRoadmap();renderRealProgress();checkPhaseUnlock();checkBackupReminder();
+  switchTab(state.tab,false);
+  let qb=document.getElementById('quietBtn');
+  qb.textContent=quietMode?'🔇':'🔊';
+  qb.classList.toggle('active',quietMode);
+  qb.title=quietMode?'Quiet mode is on — tap for sound':'Sound is on — tap for quiet mode (vibration only)';
+  updateWakeDot();
+}
+
+function renderGuided(){
+  let seg=state.guided.segment||'main';
+  let sf=segmentFlat();
+  if(state.guided.idx>=sf.length)state.guided.idx=0;
+
+  // Current exercise — works for all three segments since they all have .ex
+  let cur=sf[state.guided.idx];
+  let e=cur.ex;
+  let m=currentMode();
+  let exTime=segmentExTime(); // 30 warmup, 40 cooldown, workTime() main
+
+  // Top kicker + title + weight
+  let kicker='';
+  if(seg==='warmup')     kicker=`🌅 Warm-up · ${state.guided.idx+1}/${sf.length}`;
+  else if(seg==='cooldown') kicker=`🌙 Cool-down · ${state.guided.idx+1}/${sf.length}`;
+  else                   kicker=`${workoutName(state.tab)} · C${cur.ci+1} · R${state.guided.round}`;
+  document.getElementById('gKicker').textContent=kicker;
+  document.getElementById('gTitle').textContent=e.name;
+
+  // Weight: warmup/cooldown are bodyweight, main uses weight()
+  let md=getMuscleData(e.muscle);
+  let weightStr=(seg==='main')?weight(e):'';
+  let gw=document.getElementById('gWeight');
+  gw.style.cssText='display:flex;align-items:center;gap:5px;flex-wrap:wrap;border-radius:12px';
+  gw.innerHTML=(weightStr?`<span>${weightStr} •</span>`:'')
+    +`<span style="font-size:11px;font-weight:700">${md.precise}</span>`;
+
+  // Video
+  let vid=document.getElementById('gVideo');
+  vid.href=e.video||'#';
+  vid.style.display=e.video?'inline-grid':'none';
+
+  // Timer number
+  document.getElementById('gTimer').textContent=state.guided.time;
+
+  // Mode badge
+  document.getElementById('gBadge').textContent=seg==='main'?m.label:segmentLabel();
+
+  // Round dots — only meaningful in main segment
+  let dotsEl=document.getElementById('roundDots');
+  dotsEl.innerHTML='';
+  if(seg==='main'){
+    for(let i=1;i<=rounds();i++){
+      let d=document.createElement('span');
+      d.className='rdot'+(i<state.guided.round?' done':i===state.guided.round?' current':'');
+      dotsEl.appendChild(d);
+    }
+  }
+
+  // Circuit / exercise meta
+  if(seg==='main'){
+    document.getElementById('gCircuit').textContent=`C${cur.ci+1}/${selectedCircuits().length}`;
+    document.getElementById('gExercise').textContent=`E${cur.ei+1}/${workouts[state.tab].circuits[cur.ci][1].length}`;
+  } else {
+    document.getElementById('gCircuit').textContent='';
+    document.getElementById('gExercise').textContent=`${state.guided.idx+1}/${sf.length}`;
+  }
+
+  // State pill — warmup/cooldown are always "work" (no rest between moves)
+  let pill=document.getElementById('statePill');
+  let lbl=document.getElementById('stateLabel');
+  // In warmup/cooldown, work=true always (no rest phase)
+  let isWork=seg!=='main'?true:state.guided.work;
+  pill.classList.toggle('rest',!isWork);
+  pill.classList.toggle('paused',!isGuidedRunning);
+
+  let atFull=state.guided.time===(isWork?exTime:currentRestTime());
+  if(!isGuidedRunning){
+    lbl.textContent=atFull?'TAP TO START':'PAUSED';
+  } else {
+    lbl.textContent=seg==='warmup'?'WARM-UP':seg==='cooldown'?'COOL-DOWN':isWork?'WORK':'REST';
+  }
+
+  // Play button label
+  let ppBtn=document.getElementById('playPauseBtn');
+  ppBtn.textContent=isGuidedRunning?'⏸ Pause':'▶ '+(atFull?'Start':'Resume');
+
+  // Guided card colour — warmup/cooldown use neutral, not rest-mode blue
+  let card=document.querySelector('.guided');
+  card.classList.toggle('rest-mode',seg==='main'&&!state.guided.work);
+  card.classList.toggle('rest-pulse',seg==='main'&&!state.guided.work&&state.guided.time<=5&&isGuidedRunning);
+  card.classList.toggle('work-pulse',isWork&&state.guided.time<=5&&isGuidedRunning);
+
+  // Ring progress — for warmup/cooldown use exTime as the total
+  let ring=document.getElementById('timerRing');
+  let total=(seg==='main'&&!state.guided.work)?currentRestTime():exTime;
+  let timePct=(state.guided.time/total)*100;
+  if(seg==='main'&&!state.guided.work){
+    ring.style.background=`conic-gradient(#4a90c2 ${timePct}%,#dcecf7 0)`;
+  } else if(seg==='warmup'){
+    ring.style.background=`conic-gradient(#d4a853 ${timePct}%,#fdf3e0 0)`;
+  } else if(seg==='cooldown'){
+    ring.style.background=`conic-gradient(#7b6faa ${timePct}%,#ede9f7 0)`;
+  } else {
+    ring.style.background=`conic-gradient(var(--phase) ${timePct}%,color-mix(in srgb,var(--phase) 16%,white) 0)`;
+  }
+
+  // Overall session progress — approximate including warmup/cooldown
+  let warmupTotal=state.warmupEnabled?warmupFlat().length:0;
+  let mainTotal=flat().length*rounds();
+  let cooldownTotal=state.cooldownEnabled?cooldownFlat().length:0;
+  let grandTotal=warmupTotal+mainTotal+cooldownTotal;
+  let currentStep=0;
+  if(seg==='warmup')     currentStep=state.guided.idx+1;
+  else if(seg==='main')  currentStep=warmupTotal+(state.guided.round-1)*flat().length+state.guided.idx+1;
+  else                   currentStep=warmupTotal+mainTotal+state.guided.idx+1;
+  document.getElementById('trackerFill').style.width=Math.round((currentStep/grandTotal)*100)+'%';
+
+  // REST TAKEOVER (only shown for main segment rest phase)
+  document.getElementById('restTimer').textContent=state.guided.time;
+  let breathPhase=Math.floor(((currentRestTime()-state.guided.time)%8)/4);
+  let isInhale=breathPhase===0;
+  let arrow=document.getElementById('breathArrow');
+  let disc=document.getElementById('breathDisc');
+  if(arrow)arrow.textContent=isInhale?'↑':'↓';
+  if(disc){disc.classList.toggle('inhale',isInhale);disc.classList.toggle('exhale',!isInhale)}
+
+  // Next up
+  let nextEx=null;
+  let nextExCi=null;
+  let nextLabel='';
+  if(seg==='warmup'){
+    let nw=warmupFlat()[state.guided.idx+1];
+    if(nw)  nextLabel='Up next: '+nw.ex.name;
+    else    nextLabel=state.warmupEnabled&&state.cooldownEnabled?'Main workout starting next 💪':'Last warm-up move!';
+  } else if(seg==='main'){
+    let nf=flat();
+    let nm=nf[state.guided.idx+1]||(state.guided.round<rounds()?nf[0]:null);
+    if(nm){
+      nextLabel='Up next: '+nm.ex.name;
+      nextEx=nm.ex;
+      nextExCi=nm.ci;
+    } else {
+      nextLabel=state.cooldownEnabled?'Cool-down up next 🌙':'🎉 Last exercise!';
+    }
+  } else {
+    let nc=cooldownFlat()[state.guided.idx+1];
+    nextLabel=nc?'Up next: '+nc.ex.name:'🌿 Session complete — great work!';
+  }
+  document.getElementById('gNext').textContent=nextLabel;
+
+  // TEST: inline auto-playing video + muscle icon for Workout A Circuit 1 only.
+  // Persists through WORK *and* REST (so the video can be watched while resting/getting ready) —
+  // this deliberately overrides the normal rest-takeover panel for this one circuit, see CSS.
+  let ivWrap=document.getElementById('inlineVideoWrap');
+  let ivFrame=document.getElementById('inlineVideoFrame');
+  let guidedScreen=document.getElementById('guidedScreen');
+  let muscleRow=document.getElementById('gMuscleRow');
+  let weightProg=document.getElementById('gWeightProg');
+  let cueText=document.getElementById('gCueText');
+  let card2=document.querySelector('.guided');
+  let workScope=seg==='main'&&state.tab===INLINE_VIDEO_TEST_TAB&&cur.ci===INLINE_VIDEO_TEST_CIRCUIT;
+  let restScope=seg==='main'&&!isWork&&state.tab===INLINE_VIDEO_TEST_TAB&&nextExCi===INLINE_VIDEO_TEST_CIRCUIT;
+  let inTestScope=workScope||restScope;
+  let videoTargetEx=isWork?(workScope?e:null):(restScope?nextEx:null);
+  let shouldPlay=inTestScope&&isGuidedRunning&&videoTargetEx&&videoTargetEx.video;
+  card2.classList.toggle('video-test-active',inTestScope&&isGuidedRunning);
+  if(shouldPlay){
+    if(ivFrame.dataset.srcFor!==videoTargetEx.id){ // only reload the iframe when the target exercise actually changes
+      ivFrame.src=ytEmbedUrl(videoTargetEx.video);
+      ivFrame.dataset.srcFor=videoTargetEx.id;
+    }
+    ivWrap.classList.add('active');
+    guidedScreen.classList.add('video-active');
+    let vmd=getMuscleData(videoTargetEx.muscle);
+    document.getElementById('gMuscleIcon').innerHTML=vmd.svg;
+    document.getElementById('gMuscleName').textContent=videoTargetEx.muscle;
+    document.getElementById('gMusclePrecise').textContent=vmd.precise;
+    muscleRow.classList.add('show');
+    document.getElementById('gBlockbar').textContent=progBlocks(videoTargetEx);
+    document.getElementById('gTarget').textContent='Phase 4 target: '+videoTargetEx.target;
+    weightProg.classList.add('show');
+    cueText.textContent=videoTargetEx.cue||'';
+    cueText.classList.toggle('show',!!videoTargetEx.cue);
+  } else {
+    ivWrap.classList.remove('active');
+    guidedScreen.classList.remove('video-active');
+    muscleRow.classList.remove('show');
+    weightProg.classList.remove('show');
+    cueText.classList.remove('show');
+    if(ivFrame.dataset.srcFor){ivFrame.src='';delete ivFrame.dataset.srcFor} // stop playback (out of scope / paused)
+  }
+
+  // Rest screen next-exercise detail (main segment only)
+  if(nextEx){
+    document.getElementById('restNextName').textContent=nextEx.name;
+    document.getElementById('restNextWeight').textContent=weight(nextEx);
+    document.getElementById('restNextMuscle').textContent=nextEx.muscle;
+    document.getElementById('restNextCue').innerHTML=nextEx.cue.replace(/(exhale|pelvic floor|breathe|inhale)/gi,'<strong>$1</strong>');
+  } else if(seg==='main'){
+    let nextSegName=state.cooldownEnabled?'Cool-down':'done';
+    document.getElementById('restNextName').textContent=`Up next: ${nextSegName}`;
+    document.getElementById('restNextWeight').textContent='';
+    document.getElementById('restNextMuscle').textContent='';
+    document.getElementById('restNextCue').textContent=state.cooldownEnabled?'Almost there — a short cool-down follows 🌙':'Last one — finish strong 🌿';
+  }
+
+  // Warm-up/cool-down toggle button visual sync
+  let wu=document.getElementById('warmupToggle');
+  let cd=document.getElementById('cooldownToggle');
+  if(wu)wu.classList.toggle('active',state.warmupEnabled);
+  if(cd)cd.classList.toggle('active',state.cooldownEnabled);
+
+  updateWakeDot();
+}
+
+function progBlocks(e){
+  if(e.unit==='band'||e.unit==='bodyweight')return 'Technique progression';
+  let cur=parseFloat(weight(e));let target=parseFloat(e.target)||cur;
+  let pct=Math.min(10,Math.max(1,Math.round((cur/target)*10)));
+  return '█'.repeat(pct)+'░'.repeat(10-pct)+' '+weight(e);
+}
+
+// ── PRINT CARD ──
+function buildPrintCard(){
+  let w=workouts[state.tab],m=currentMode(),p=phaseInfo[state.phase];
+  let html=`
+    <div class="pc-header">
+      <h1>Mama Moves — ${w.title}</h1>
+      <p>${w.goal}</p>
+      <div class="pc-meta">
+        <span>Phase ${state.phase}: ${p.name}</span>
+        <span>${m.label} mode</span>
+        <span>${m.structure}</span>
+        <span>${workTime()}s work / ${restTime()}s rest</span>
+      </div>
+    </div>`;
+  selectedCircuits().forEach((c,i)=>{
+    html+=`<div class="pc-circuit"><div class="pc-circuit-title">Circuit ${i+1}: ${c[0]} — ${rounds()} rounds</div>`;
+    c[1].forEach(e=>{
+      html+=`<div class="pc-ex">
+        <div class="pc-box"></div>
+        <div>
+          <div class="pc-ex-name">${e.name} <span style="color:#666;font-weight:400">(${e.muscle})</span></div>
+          <div class="pc-ex-cue">${e.cue}</div>
+        </div>
+        <div class="pc-ex-weight">${weight(e)}</div>
+      </div>`;
+    });
+    html+=`</div>`;
+  });
+  html+=`<div class="pc-footer">Exhale on effort · gentle pelvic floor lift on every rep · stop and regress if you feel heaviness, leaking or pressure.</div>`;
+  document.getElementById('printCard').innerHTML=html;
+}
+function printWorkoutCard(){
+  buildPrintCard();
+  setTimeout(()=>window.print(),50);
+}
+
+function renderWorkouts(){
+  let root=document.getElementById('workouts');root.innerHTML='';
+  Object.entries(workouts).forEach(([tab,w])=>{
+    let isBuild=tab==='build';
+    let p=document.createElement('div');p.className='panel';p.id='panel-'+tab;
+    let f=flat(tab),d=f.filter(x=>state.done[x.ex.id]).length;
+    let metaHtml=isBuild
+      ?`<span class="badge gold">Exercise Library</span><span class="badge">All phases</span><span class="badge soft">4 progression groups</span>`
+      :`<span class="badge gold">${currentMode().time}</span><span class="badge">${currentMode().structure}</span><span class="badge soft">${workTime()}s work / ${restTime()}s rest</span>`;
+    p.innerHTML=`<div class="whead"><div class="wtitle">${w.title}</div><div class="meta">${metaHtml}</div><p class="small" style="margin-top:5px">${w.goal}</p></div><div class="progress"><div class="pline"><span>Completion</span><span>${d}/${f.length}</span></div><div class="track"><div class="fill" style="width:${f.length?d/f.length*100:0}%"></div></div></div>`;
+    selectedCircuits(tab).forEach((c,i)=>{
+      let det=document.createElement('details');det.className='circuit';if(i===0)det.open=true;
+      let circSub=isBuild?'Progress through each group as your strength builds':`${rounds()} rounds · ${workTime()}s work / ${restTime()}s rest`;
+      det.innerHTML=`<summary><div class="clabel"><div class="num">${i+1}</div><div><div class="cname">${c[0]}</div><div class="csub">${circSub}</div></div></div></summary><div class="cbody"></div>`;
+      let body=det.querySelector('.cbody');
+      c[1].forEach(e=>{
+        let div=document.createElement('div');div.className='exercise'+(state.done[e.id]?' done':'');
+        let md=getMuscleData(e.muscle);
+        let drBadge=e.dr?`<span class="dr-check">👁 DR self-check</span>`:'';
+        let kneeBadge=e.knee?`<span class="knee-check">🦵 Knee / IT band</span>`:'';
+        let wristBadge=e.wrist?`<span class="wrist-check">⚠️ Wrist loading</span>`:'';
+        let drCue=e.dr?`<div class="dr-cue">Watch for doming or coning of the midline. If you see it, reduce load or regress. Safe for 1–2 finger DR with good tension.</div>`:'';
+        let kneeCue=e.knee?`<div class="knee-cue">IT band / knee history: monitor for lateral knee discomfort as load increases. Reduce range of motion or substitute bilateral version if symptoms return.</div>`:'';
+        let wristCue=e.wrist?`<div class="wrist-cue">Wrist loading: warm up wrists first (slow circles, gentle weight-bearing). If uncomfortable, use fists, forearms, or substitute hip thrust hold.</div>`:'';
+        div.innerHTML=`<input class="check" type="checkbox" ${state.done[e.id]?'checked':''} onchange="toggleDone('${e.id}',this.checked)"><div><div class="ename">${e.name}</div><div class="echips"><span class="weight">Phase ${state.phase}: ${weight(e)}</span>${drBadge}${kneeBadge}${wristBadge}</div><div class="muscle-block"><div class="muscle-svg">${md.svg}</div><div><div class="muscle-name">${e.muscle}</div><div class="muscle-precise">${md.precise}</div></div></div><div class="weight-prog"><div class="blockbar">${progBlocks(e)}</div><div class="target">Phase 4 target: ${e.target}</div></div><div class="cue">${e.cue}</div>${drCue}${kneeCue}${wristCue}${e.video?`<a class="video" href="${e.video}" target="_blank" rel="noopener">▶ Watch Short</a>`:''}</div>`;
+        body.appendChild(div);
+      });
+      p.appendChild(det);
+    });
+    root.appendChild(p);
+  });
+}
+
+function renderRoadmap(){
+  document.getElementById('roadmap').innerHTML=[1,2,3,4].map(i=>{
+    let p=phaseInfo[i];
+    return`<div class="road ${state.phase===i?'active':''}"><h4>${p.emoji} Phase ${i} — ${p.name}</h4><ul><li>${p.focus}</li><li>Upper: ${p.upper}</li><li>Lower: ${p.lower}</li></ul><div class="weights">${i===1?'🔒 Complete locked':i===2?'Complete optional':'All modes'}</div></div>`;
+  }).join('');
+}
+
+function renderRealProgress(){
+  let key=['shoulder','row','goblet','rdl','hip','reverse'];
+  let all=Object.values(workouts).flatMap(w=>w.circuits).flatMap(c=>c[1]);
+  let picked=key.map(k=>all.find(e=>e.id.includes(k)||e.name.toLowerCase().includes(k))).filter(Boolean);
+  document.getElementById('realProgress').innerHTML=picked.slice(0,6).map(e=>{
+    let start=e.unit==='band'||e.unit==='bodyweight'?e.unit:e.weights[0]+' '+e.unit;
+    let now=weight(e);let end=e.target;
+    let pct=(e.unit==='band'||e.unit==='bodyweight')?'technique':Math.round(((parseFloat(now)||1)/(parseFloat(start)||1)-1)*100)+'%';
+    return`<div class="progress-card"><b>${e.name}</b><span>${start} → ${now} → ${end}</span><span class="pct">Progress: ${pct}</span></div>`;
+  }).join('');
+}
+
+// ── ACTIONS ──
+function setPhase(p){state.phase=p;if(!allowedModes().includes(state.mode))state.mode='standard';save();render()}
+function setMode(m){if(!allowedModes().includes(m))return;state.mode=m;state.guided.idx=0;state.guided.round=1;state.guided.time=workTime();state.guided.work=true;save();render()}
+function setEnergy(e){
+  state.energy=e;
+  // reset timer to new work duration for current tempo
+  state.guided.time=workTime();
+  state.guided.work=true;
+  save();render();
+}
+function switchTab(tab,rer=true){
+  state.tab=tab;
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  let p=document.getElementById('panel-'+tab);if(p)p.classList.add('active');
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab')[['glute','posture','athlete','build'].indexOf(tab)].classList.add('active');
+  if(rer){state.guided.idx=0;state.guided.round=1;state.guided.time=workTime();state.guided.work=true;save();render()}
+}
+function toggleDone(id,v){state.done[id]=v;save();render()}
+
+function flashGo(){
+  let gf=document.getElementById('goFlash');
+  let card=document.querySelector('.guided');
+  if(gf){gf.classList.remove('active');void gf.offsetWidth;gf.classList.add('active')}
+  if(card){card.classList.add('work-start-pop');setTimeout(()=>card.classList.remove('work-start-pop'),380)}
+}
+
+function startCountdown(then){
+  // 3-2-1 countdown overlay shown on the ring before work interval begins
+  isCountingDown=true;
+  let n=3;
+  let el=document.getElementById('countdownNum');
+  let co=document.getElementById('countdownOverlay');
+  if(co)co.classList.add('active');
+  function showNumber(num){
+    if(!el)return;
+    el.textContent=num;
+    el.style.animation='none';
+    el.getBoundingClientRect(); // force reflow so the animation restarts reliably
+    el.style.animation='countPop 1.4s ease-out forwards';
+  }
+  function tick(){
+    showNumber(n);
+    beep(680,80);haptic([30]);
+    n--;
+    if(n>0){
+      int=setTimeout(tick,1000);
+    } else {
+      int=setTimeout(()=>{
+        isCountingDown=false;
+        if(co)co.classList.remove('active');
+        then();
+      },1000);
+    }
+  }
+  tick();
+}
+
+function toggleGuidedTimer(){
+  if(isCountingDown)return;
+  if(!isGuidedRunning){
+    // on very first tap (at full time, segment=main), start from first segment
+    let atStart=state.guided.segment==='main'&&
+                state.guided.idx===0&&
+                state.guided.round===1&&
+                state.guided.time===workTime()&&
+                state.guided.work;
+    if(atStart&&state.warmupEnabled){
+      state.guided.segment='warmup';
+      state.guided.idx=0;
+      state.guided.time=30;
+      save();
+    }
+    guidedStart();
+  } else {
+    guidedPause();
+  }
+}
+
+function guidedStart(){
+  initAudio();clearInterval(int);clearTimeout(int);isGuidedRunning=true;
+  if(wakeEnabled)requestWakeLock();
+  let seg=state.guided.segment||'main';
+  if(seg==='main'&&state.guided.work)flashGo();
+  cue(state.guided.work?'work':'rest');
+  renderGuided();
+  let exTime=segmentExTime();
+  let halfwayT=(state.guided.work)?halfwayTriggerT(exTime):null;
+  // Warm-up/cool-down have no rest phase between moves, so the full cue is announced once
+  // right at the true start of each move (guarded by time===exTime so pause/resume doesn't repeat it).
+  if((seg==='warmup'||seg==='cooldown')&&state.guided.time===exTime){
+    speakRestPreview(segmentFlat()[state.guided.idx]);
+  }
+  int=setInterval(()=>{
+    state.guided.time--;
+    let t=state.guided.time;
+    // announce at key thresholds for main segment only (warmup/cooldown are longer flow)
+    if(seg==='main'){
+      if(t===20&&state.guided.work)cue('20');
+      if(t===10)cue('10');
+    }
+    if(t===5)cue('5');
+    if(t<=3&&t>0)cue('tick');
+    if(state.guided.work&&halfwayT&&t===halfwayT)speakWorkCue(segmentFlat()[state.guided.idx],0);
+    if(t<=0)guidedNextStep(false);
+    save();renderGuided();
+  },1000);
+}
+
+function guidedPause(){
+  clearInterval(int);clearTimeout(int);int=null;
+  isGuidedRunning=false;isCountingDown=false;
+  let co=document.getElementById('countdownOverlay');
+  if(co)co.classList.remove('active');
+  releaseWakeLock();renderGuided();
+}
+function guidedReset(){guidedPause();state.guided.segment='main';state.guided.time=workTime();state.guided.work=true;state.guided.idx=0;state.guided.round=1;save();renderGuided()}
+
+function guidedNextStep(manual=true){
+  let g=state.guided;
+  let seg=g.segment||'main';
+
+  // ── WARMUP / COOLDOWN: no rest between moves, just advance exercise ──
+  if(seg==='warmup'||seg==='cooldown'){
+    let sf=segmentFlat();
+    g.idx++;
+    if(g.idx>=sf.length){
+      // finished this segment — move to next
+      if(seg==='warmup'){
+        g.segment='main';g.idx=0;g.round=1;g.time=workTime();g.work=true;
+      } else {
+        // cooldown done = full session done
+        g.segment='main';g.idx=0;g.round=1;g.time=workTime();g.work=true;
+        clearInterval(int);clearTimeout(int);
+        guidedPause();finishWorkout(false);return;
+      }
+    } else {
+      g.time=segmentExTime();
+    }
+    save();renderGuided();
+    if(!manual){
+      clearInterval(int);clearTimeout(int);
+      startCountdown(()=>{
+        cue('work');guidedStart();
+        if(g.segment==='main')speakWorkCue(flat()[g.idx]); // just handed off from warmup into the main workout
+      });
+    }
+    return;
+  }
+
+  // ── MAIN SEGMENT ──
+  if(g.work){
+    // WORK → REST
+    let isRoundBreak=(g.idx+1>=flat().length)&&(g.round<rounds());
+    g.work=false;g.roundBreak=isRoundBreak;g.time=isRoundBreak?ROUND_REST:restTime();
+    if(!manual){
+      cue('rest');
+      let upcoming=flat()[g.idx+1]||(g.round<rounds()?flat()[0]:null);
+      speakRestPreview(upcoming); // preview the next exercise's full cue while resting/getting ready
+    }
+    save();renderGuided();
+    if(!manual)guidedStart();
+  } else {
+    // REST → WORK: advance exercise/round
+    g.work=true;g.time=workTime();g.idx++;
+    let sessionDone=false;
+    if(g.idx>=flat().length){
+      g.idx=0;g.round++;
+      if(g.round>rounds()){
+        g.round=1;
+        // main workout done — move to cooldown or finish
+        let nextSeg=nextSegmentAfterMain();
+        if(nextSeg){
+          g.segment=nextSeg;g.idx=0;g.time=segmentExTime();g.work=true;
+          save();renderGuided();
+          if(!manual){
+            clearInterval(int);clearTimeout(int);
+            showToast('Main workout done 💪 Cool-down starting…');
+            setTimeout(()=>{startCountdown(()=>{cue('work');guidedStart()})},1200);
+          }
+          return;
+        } else {
+          sessionDone=true;
+          clearInterval(int);clearTimeout(int);
+          guidedPause();finishWorkout(false);
+        }
+      }
+    }
+    if(!sessionDone){
+      save();renderGuided();
+      if(!manual){
+        clearInterval(int);clearTimeout(int);
+        startCountdown(()=>{
+          flashGo();cue('work');guidedStart();
+          speakWorkCue(flat()[g.idx]); // this exercise is now starting
+        });
+      }
+    }
+  }
+}
+
+function guidedPrev(){
+  let g=state.guided;g.work=true;g.time=workTime();
+  if(g.idx>0)g.idx--;else if(g.round>1){g.round--;g.idx=flat().length-1}
+  save();renderGuided();
+}
+
+let _finishSnapshot=null; // snapshot of state before finishWorkout, for undo
+let _toastTimer=null;
+
+function finishWorkout(alertIt=true){
+  guidedPause();
+  // snapshot everything that finishWorkout changes so undo can restore exactly
+  _finishSnapshot={
+    done:JSON.parse(JSON.stringify(state.done)),
+    completed:JSON.parse(JSON.stringify(state.completed)),
+    phaseSessions:JSON.parse(JSON.stringify(state.phaseSessions)),
+    guided:JSON.parse(JSON.stringify(state.guided))
+  };
+  flat().forEach(x=>state.done[x.ex.id]=true);
+  state.completed[state.tab+'-'+new Date().toISOString().slice(0,10)]=true;
+  state.phaseSessions[state.phase]=(state.phaseSessions[state.phase]||0)+1;
+  state.guided.idx=0;state.guided.round=1;state.guided.time=workTime();state.guided.work=true;
+  save();render();
+  if(alertIt)showToast('Workout complete — brilliant work 🌿💪',true);
+}
+
+function showToast(msg,showUndo=false){
+  clearTimeout(_toastTimer);
+  document.getElementById('toastMsg').textContent=msg;
+  let undoBtn=document.getElementById('toastUndoBtn');
+  undoBtn.style.display=showUndo?'inline-block':'none';
+  let toast=document.getElementById('undoToast');
+  toast.classList.add('visible');
+  // auto-dismiss after 6 seconds
+  _toastTimer=setTimeout(()=>dismissToast(),6000);
+}
+
+function dismissToast(){
+  clearTimeout(_toastTimer);
+  document.getElementById('undoToast').classList.remove('visible');
+  _finishSnapshot=null; // snapshot no longer usable after dismiss
+}
+
+function undoFinishWorkout(){
+  if(!_finishSnapshot)return;
+  // restore everything that finishWorkout changed
+  state.done=_finishSnapshot.done;
+  state.completed=_finishSnapshot.completed;
+  state.phaseSessions=_finishSnapshot.phaseSessions;
+  state.guided=_finishSnapshot.guided;
+  _finishSnapshot=null;
+  save();render();
+  showToast('Workout unmarked — carry on 👊',false);
+}
+
+function savePause(){guidedPause();state.pause={tab:state.tab,guided:JSON.parse(JSON.stringify(state.guided)),time:new Date().toLocaleTimeString()};save();document.getElementById('controlNote').textContent='Paused at '+state.pause.time+' — tap Resume when ready.';speak('Paused')}
+function resumePause(){if(state.pause){state.tab=state.pause.tab;state.guided=state.pause.guided;save();render();document.getElementById('controlNote').textContent='Resumed. Tap Start when ready.'}}
+function toggleQuietMode(){
+  quietMode=!quietMode;state.quietMode=quietMode;save();render();
+  if(quietMode)haptic([40,30,40]); // confirm the switch with a quick buzz since sound is now off
+}
+function resetChecks(){state.done={};save();render()}
+
+// ── CUSTOM CONFIRM MODAL ──
+// Replaces native confirm(), which several mobile browsers and installed-PWA
+// contexts silently suppress (the click registers but no popup ever appears,
+// and the code after `if(!confirm(...))return;` never runs).
+let _confirmCallback=null;
+function showConfirm(message,onConfirm){
+  document.getElementById('confirmMessage').textContent=message;
+  document.getElementById('confirmCancelBtn').style.display='inline-block';
+  document.getElementById('confirmOkBtn').textContent='Confirm';
+  document.getElementById('confirmOverlay').classList.add('active');
+  _confirmCallback=onConfirm;
+}
+function showAlert(message){
+  document.getElementById('confirmMessage').textContent=message;
+  document.getElementById('confirmCancelBtn').style.display='none';
+  document.getElementById('confirmOkBtn').textContent='OK';
+  document.getElementById('confirmOverlay').classList.add('active');
+  _confirmCallback=null;
+}
+function closeConfirm(confirmed){
+  document.getElementById('confirmOverlay').classList.remove('active');
+  if(confirmed&&_confirmCallback)_confirmCallback();
+  _confirmCallback=null;
+}
+
+function resetPhaseSessions(){
+  let p=state.phase;
+  showConfirm(`Reset session count for Phase ${p} back to 0? This won't change your phase or weights.`,()=>{
+    state.phaseSessions[p]=0;
+    state.unlockDismissed[p]=false;
+    save();render();
+  });
+}
+
+function resetProgramme(){
+  showConfirm('Reset the entire programme? This sends you back to Phase 1 with 0 sessions in every phase. Your checkboxes and completed-workout history stay untouched.',()=>{
+    state.phase=1;
+    state.phaseSessions={1:0,2:0,3:0,4:0};
+    state.unlockDismissed={};
+    state.mode='standard';
+    save();render();
+  });
+}
+
+function clearData(){
+  showConfirm('Clear all Mama Moves data? This cannot be undone.',()=>{
+    ['mamaMovesV8','mamaMovesV9','mamaMovesV10','mamaMovesV11','mamaMovesV12'].forEach(k=>localStorage.removeItem(k));
+    location.reload();
+  });
+}
+
+// ── EXPORT / IMPORT BACKUP ──
+// Lets the person save their progress as a small .json file (e.g. to email
+// themselves, save in Files/Drive, or move to a new phone) and restore it later.
+function exportBackup(){
+  let payload={
+    app:'Mama Moves',
+    version:10,
+    exportedAt:new Date().toISOString(),
+    data:state
+  };
+  let json=JSON.stringify(payload,null,2);
+  let blob=new Blob([json],{type:'application/json'});
+  let url=URL.createObjectURL(blob);
+  let dateStr=new Date().toISOString().slice(0,10);
+  let a=document.createElement('a');
+  a.href=url;
+  a.download=`mama-moves-backup-${dateStr}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  // a successful export addresses the backup reminder regardless of how it was triggered
+  if(!state.backupReminderDismissed){
+    state.backupReminderDismissed=true;
+    save();
+    let sec=document.getElementById('backupReminderSection');
+    if(sec)sec.style.display='none';
+  }
+}
+
+function importBackup(event){
+  let file=event.target.files&&event.target.files[0];
+  if(!file)return;
+  let reader=new FileReader();
+  reader.onload=function(e){
+    let parsed;
+    try{
+      parsed=JSON.parse(e.target.result);
+    }catch(err){
+      showAlert('This file could not be read — it doesn\'t look like a valid Mama Moves backup.');
+      event.target.value='';
+      return;
+    }
+    // Accept either the wrapped {app, data} format or a raw state object
+    let incoming=(parsed&&parsed.data)?parsed.data:parsed;
+    if(!incoming||typeof incoming!=='object'||!('phase' in incoming)){
+      showAlert('This file doesn\'t look like a valid Mama Moves backup.');
+      event.target.value='';
+      return;
+    }
+    let exportedAt=parsed.exportedAt?new Date(parsed.exportedAt).toLocaleDateString():'an unknown date';
+    showConfirm(`Restore this backup from ${exportedAt}? This will replace your current progress, checkboxes and phase data on this device.`,()=>{
+      state=incoming;
+      // backfill any fields that might be missing from an older export
+      state.phase=state.phase||1;
+      state.mode=state.mode||'standard';
+      state.energy=state.energy||'yellow';
+      state.tab=state.tab||'glute';
+      state.done=state.done||{};
+      state.guided=state.guided||{idx:0,round:1,time:40,work:true};
+      state.completed=state.completed||{};
+      state.phaseSessions=state.phaseSessions||{1:0,2:0,3:0,4:0};
+      state.unlockDismissed=state.unlockDismissed||{};
+      save();render();
+    });
+    event.target.value='';
+  };
+  reader.onerror=function(){
+    showAlert('There was a problem reading that file. Please try again.');
+    event.target.value='';
+  };
+  reader.readAsText(file);
+}
+
+// ── PWA INSTALL ──
+// Chrome/Edge/Android: capture the native install prompt and show our own button
+let deferredInstallPrompt=null;
+window.addEventListener('beforeinstallprompt',(e)=>{
+  e.preventDefault();
+  deferredInstallPrompt=e;
+  let btn=document.getElementById('installBtn');
+  if(btn)btn.style.display='inline-block';
+});
+async function handleInstallClick(){
+  if(deferredInstallPrompt){
+    deferredInstallPrompt.prompt();
+    const {outcome}=await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt=null;
+    document.getElementById('installBtn').style.display='none';
+  } else if(/iphone|ipad|ipod/i.test(navigator.userAgent)){
+    showAlert('To install: tap the Share icon below, then "Add to Home Screen".');
+  } else {
+    showAlert('To install: open your browser menu and choose "Add to Home Screen" or "Install app".');
+  }
+}
+window.addEventListener('appinstalled',()=>{
+  let btn=document.getElementById('installBtn');
+  if(btn)btn.style.display='none';
+});
+
+// Register a minimal inline service worker (via Blob URL) for basic offline caching.
+// Single-file app means there's nothing else to fetch, but this satisfies PWA installability
+// criteria on Chromium browsers and lets the page open instantly even with no signal.
+if('serviceWorker' in navigator){
+  try{
+    const swCode=`
+      self.addEventListener('install',e=>self.skipWaiting());
+      self.addEventListener('activate',e=>self.clients.claim());
+      self.addEventListener('fetch',e=>{
+        e.respondWith(
+          caches.match(e.request).then(cached=>cached||fetch(e.request).catch(()=>cached))
+        );
+      });
+    `;
+    const swBlob=new Blob([swCode],{type:'application/javascript'});
+    const swUrl=URL.createObjectURL(swBlob);
+    navigator.serviceWorker.register(swUrl).catch(()=>{});
+  }catch(e){}
+}
+
+render();
+</script>
+<!-- UNDO TOAST -->
+<div class="toast" id="undoToast">
+  <span class="toast-msg" id="toastMsg">Workout complete 🌿</span>
+  <button class="toast-undo" id="toastUndoBtn" onclick="undoFinishWorkout()">Undo</button>
+  <button class="toast-close" onclick="dismissToast()">✕</button>
+</div>
+
+</body>
+</html>
